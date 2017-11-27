@@ -16,15 +16,15 @@ class AnalyticsStoreClass extends EventEmitter {
         store.subscribe(() => {
             const newEntities = store.getState().entities.admin;
 
-            const entities = this.entities;
-            this.entities = newEntities;
-
-            const analyticsChanged = newEntities.analytics !== entities.analytics;
-            const teamAnalyticsChanged = newEntities.teamAnalytics !== entities.teamAnalytics;
-
-            if (analyticsChanged || teamAnalyticsChanged) {
+            if (newEntities.analytics !== this.entities.analytics) {
                 this.emitChange();
             }
+
+            if (newEntities.teamAnalytics !== this.entities.teamAnalytics) {
+                this.emitChange();
+            }
+
+            this.entities = newEntities;
         });
     }
 

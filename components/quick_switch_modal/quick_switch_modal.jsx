@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
-import {browserHistory} from 'react-router';
+import {browserHistory} from 'react-router/es6';
 
 import {getChannel} from 'mattermost-redux/selectors/entities/channels';
 
@@ -72,12 +72,16 @@ export default class QuickSwitchModal extends React.PureComponent {
         this.channelProviders = [new SwitchChannelProvider()];
         this.teamProviders = [new SwitchTeamProvider()];
 
-        this.switchBox = null;
-
         this.state = {
             text: '',
             mode: props.initialMode
         };
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.show && !prevProps.show) {
+            this.focusTextbox();
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -87,20 +91,13 @@ export default class QuickSwitchModal extends React.PureComponent {
     }
 
     focusTextbox() {
-        if (this.switchBox == null) {
+        if (this.refs.switchbox == null) {
             return;
         }
 
-        const textbox = this.switchBox.getTextbox();
-        if (document.activeElement !== textbox) {
-            textbox.focus();
-            Utils.placeCaretAtEnd(textbox);
-        }
-    }
-
-    setSwitchBoxRef = (input) => {
-        this.switchBox = input;
-        this.focusTextbox();
+        const textbox = this.refs.switchbox.getTextbox();
+        textbox.focus();
+        Utils.placeCaretAtEnd(textbox);
     }
 
     onShow() {
@@ -314,7 +311,7 @@ export default class QuickSwitchModal extends React.PureComponent {
                         {help}
                     </div>
                     <SuggestionBox
-                        ref={this.setSwitchBoxRef}
+                        ref='switchbox'
                         className='form-control focused'
                         type='input'
                         onChange={this.onChange}

@@ -7,7 +7,7 @@ import {Modal} from 'react-bootstrap';
 
 import DeleteChannelModal from 'components/delete_channel_modal/delete_channel_modal.jsx';
 
-jest.mock('react-router', () => ({
+jest.mock('react-router/es6', () => ({
     browserHistory: {
         push: jest.fn()
     }

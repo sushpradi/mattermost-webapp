@@ -69,9 +69,7 @@ export default class InstalledOAuthApps extends React.PureComponent {
     }
 
     deleteOAuthApp = (app) => {
-        if (app && app.id) {
-            this.props.actions.deleteOAuthApp(app.id);
-        }
+        this.props.actions.deleteOAuthApp(app.id);
     }
 
     oauthAppCompare(a, b) {

@@ -1,10 +1,9 @@
-// Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
+// Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
 import PropTypes from 'prop-types';
 import React from 'react';
-
-import BlockableLink from 'components/admin_console/blockable_link';
+import {Link} from 'react-router/es6';
 
 import * as Utils from 'utils/utils.jsx';
 
@@ -64,7 +63,7 @@ export default class AdminSidebarSection extends React.Component {
         }
 
         let sidebarItem = (
-            <BlockableLink
+            <Link
                 id={Utils.createSafeId(this.props.name)}
                 className={`${className}-title`}
                 activeClassName={`${className}-title ${className}-title--active`}
@@ -76,7 +75,7 @@ export default class AdminSidebarSection extends React.Component {
                     {this.props.title}
                 </span>
                 {this.props.action}
-            </BlockableLink>
+            </Link>
         );
 
         if (this.props.type === 'text') {

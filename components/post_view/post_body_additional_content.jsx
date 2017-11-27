@@ -7,7 +7,6 @@ import React from 'react';
 import BrowserStore from 'stores/browser_store.jsx';
 
 import * as Utils from 'utils/utils.jsx';
-import {StoragePrefixes} from 'utils/constants.jsx';
 
 import YoutubeVideo from 'components/youtube_video';
 
@@ -36,12 +35,7 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
         /**
          * User's preference to link previews
          */
-        previewEnabled: PropTypes.bool,
-
-        /**
-         * Flag passed down to PostBodyAdditionalContent for determining if post embed is visible
-         */
-        isEmbedVisible: PropTypes.bool
+        previewEnabled: PropTypes.bool
     }
 
     static defaultProps = {
@@ -55,11 +49,13 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
         this.getSlackAttachment = this.getSlackAttachment.bind(this);
         this.generateToggleableEmbed = this.generateToggleableEmbed.bind(this);
         this.generateStaticEmbed = this.generateStaticEmbed.bind(this);
+        this.toggleEmbedVisibility = this.toggleEmbedVisibility.bind(this);
         this.isLinkToggleable = this.isLinkToggleable.bind(this);
         this.handleLinkLoadError = this.handleLinkLoadError.bind(this);
         this.handleLinkLoaded = this.handleLinkLoaded.bind(this);
 
         this.state = {
+            embedVisible: PostBodyAdditionalContent.isEmbedVisible(props),
             link: Utils.extractFirstLink(props.post.message),
             linkLoadError: false,
             linkLoaded: false
@@ -72,8 +68,9 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.post.message !== this.props.post.message) {
+        if (nextProps.previewCollapsed !== this.props.previewCollapsed || nextProps.post.message !== this.props.post.message) {
             this.setState({
+                embedVisible: PostBodyAdditionalContent.isEmbedVisible(nextProps),
                 link: Utils.extractFirstLink(nextProps.post.message)
             }, () => {
                 // check the availability of the image link
@@ -82,9 +79,13 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
         }
     }
 
-    toggleEmbedVisibility = () => {
+    toggleEmbedVisibility() {
         // save the taggle info in the localstorage
-        BrowserStore.setGlobalItem(StoragePrefixes.EMBED_VISIBLE + this.props.post.id, !this.props.isEmbedVisible);
+        BrowserStore.setItem(`isVisible-${this.props.post.id}`, !this.state.embedVisible);
+
+        this.setState((prevState) => {
+            return {embedVisible: !prevState.embedVisible};
+        });
     }
 
     getSlackAttachment() {
@@ -106,7 +107,7 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
     preCheckImageLink() {
         // check only if embedVisible is false i.e the image are by default hidden/collapsed
         // if embedVisible is true, the image is rendered, during which image load error is captured
-        if (!this.props.isEmbedVisible && this.isLinkImage(this.state.link)) {
+        if (!this.state.embedVisible && this.isLinkImage(this.state.link)) {
             const image = new Image();
             image.src = this.state.link;
 
@@ -170,7 +171,7 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
                 <YoutubeVideo
                     channelId={this.props.post.channel_id}
                     link={link}
-                    show={this.props.isEmbedVisible}
+                    show={this.state.embedVisible}
                     onLinkLoaded={this.handleLinkLoaded}
                 />
             );
@@ -201,6 +202,7 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
                 <PostAttachmentOpenGraph
                     link={link}
                     previewCollapsed={this.props.previewCollapsed}
+                    previewEnabled={this.props.previewEnabled}
                     post={this.props.post}
                 />
             );
@@ -219,7 +221,7 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
                 <a
                     key='toggle'
                     className={`post__embed-visibility ${prependToggle ? 'pull-left' : ''}`}
-                    data-expanded={this.props.isEmbedVisible}
+                    data-expanded={this.state.embedVisible}
                     aria-label='Toggle Embed Visibility'
                     onClick={this.toggleEmbedVisibility}
                 />
@@ -240,7 +242,7 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
                 }
             }
 
-            if (this.props.isEmbedVisible) {
+            if (this.state.embedVisible) {
                 contents.push(
                     <div
                         key='embed'
@@ -270,5 +272,10 @@ export default class PostBodyAdditionalContent extends React.PureComponent {
         }
 
         return this.props.children;
+    }
+
+    static isEmbedVisible(props) {
+        // check first in localstorage, if not present, consider previewCollapsed from the parent component
+        return BrowserStore.getItem(`isVisible-${props.post.id}`, props.previewCollapsed.startsWith('false'));
     }
 }

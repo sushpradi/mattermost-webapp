@@ -4,7 +4,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {browserHistory} from 'react-router';
+import {browserHistory} from 'react-router/es6';
 import {FormattedMessage} from 'react-intl';
 
 import LoadingScreen from 'components/loading_screen.jsx';
@@ -36,6 +36,11 @@ export default class EditOAuthApp extends React.PureComponent {
         * The OAuthApp data
         */
         oauthApp: PropTypes.object,
+
+        /**
+        * The request state for editOAuthApp action. Contains status and error
+        */
+        editOAuthAppRequest: PropTypes.object.isRequired,
 
         actions: PropTypes.shape({
 
@@ -98,7 +103,7 @@ export default class EditOAuthApp extends React.PureComponent {
     submitOAuthApp = async () => {
         this.setState({serverError: ''});
 
-        const {data, error} = await this.props.actions.editOAuthApp(this.newApp);
+        const data = await this.props.actions.editOAuthApp(this.newApp);
 
         if (data) {
             browserHistory.push(`/${this.props.team.name}/integrations/oauth2-apps`);
@@ -107,8 +112,8 @@ export default class EditOAuthApp extends React.PureComponent {
 
         this.setState({showConfirmModal: false});
 
-        if (error) {
-            this.setState({serverError: error.message});
+        if (this.props.editOAuthAppRequest.error) {
+            this.setState({serverError: this.props.editOAuthAppRequest.error.message});
         }
     }
 

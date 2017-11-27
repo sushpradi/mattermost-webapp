@@ -4,7 +4,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedHTMLMessage, FormattedMessage} from 'react-intl';
-import {browserHistory, Link} from 'react-router';
+import {browserHistory, Link} from 'react-router/es6';
 
 import {trackEvent} from 'actions/diagnostics_actions.jsx';
 import * as GlobalActions from 'actions/global_actions.jsx';
@@ -207,7 +207,7 @@ export default class SignupEmail extends React.Component {
         }
 
         const providedPassword = this.refs.password.value;
-        const pwdError = Utils.isValidPassword(providedPassword, Utils.getPasswordConfig());
+        const pwdError = Utils.isValidPassword(providedPassword);
         if (pwdError) {
             this.setState({
                 nameError: '',
@@ -492,7 +492,8 @@ export default class SignupEmail extends React.Component {
                             />
                             {' '}
                             <Link
-                                to={'/login' + this.props.location.search}
+                                to={'/login'}
+                                query={this.props.location.query}
                             >
                                 <FormattedMessage
                                     id='signup_user_completed.signIn'

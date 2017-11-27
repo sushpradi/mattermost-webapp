@@ -20,8 +20,6 @@ export default function StatusIcon(props) {
             statusIcon = Constants.ONLINE_AVATAR_SVG;
         } else if (status === 'away') {
             statusIcon = Constants.AWAY_AVATAR_SVG;
-        } else if (status === 'dnd') {
-            statusIcon = Constants.DND_AVATAR_SVG;
         } else {
             statusIcon = Constants.OFFLINE_AVATAR_SVG;
         }
@@ -29,8 +27,6 @@ export default function StatusIcon(props) {
         statusIcon = Constants.ONLINE_ICON_SVG;
     } else if (status === 'away') {
         statusIcon = Constants.AWAY_ICON_SVG;
-    } else if (status === 'dnd') {
-        statusIcon = Constants.DND_ICON_SVG;
     } else {
         statusIcon = Constants.OFFLINE_ICON_SVG;
     }

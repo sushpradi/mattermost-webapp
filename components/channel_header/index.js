@@ -12,10 +12,6 @@ import {getMyTeamMember} from 'mattermost-redux/selectors/entities/teams';
 import {getCurrentUser, getStatusForUserId, getUser} from 'mattermost-redux/selectors/entities/users';
 import {getUserIdFromChannelName, isDefault, isFavoriteChannel} from 'mattermost-redux/utils/channel_utils';
 
-import {showFlaggedPosts, showPinnedPosts, showMentions, closeRightHandSide} from 'actions/views/rhs';
-
-import {getRhsState} from 'selectors/rhs';
-
 import ChannelHeader from './channel_header.jsx';
 
 function mapStateToProps(state, ownProps) {
@@ -40,8 +36,7 @@ function mapStateToProps(state, ownProps) {
         currentUser: user,
         dmUser,
         dmUserStatus,
-        enableFormatting: getBool(state, Preferences.CATEGORY_ADVANCED_SETTINGS, 'formatting', true),
-        rhsState: getRhsState(state)
+        enableFormatting: getBool(state, Preferences.CATEGORY_ADVANCED_SETTINGS, 'formatting', true)
     };
 }
 
@@ -50,11 +45,7 @@ function mapDispatchToProps(dispatch) {
         actions: bindActionCreators({
             leaveChannel,
             favoriteChannel,
-            unfavoriteChannel,
-            showFlaggedPosts,
-            showPinnedPosts,
-            showMentions,
-            closeRightHandSide
+            unfavoriteChannel
         }, dispatch)
     };
 }

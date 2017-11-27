@@ -4,7 +4,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedHTMLMessage, FormattedMessage} from 'react-intl';
-import {browserHistory} from 'react-router';
+import {browserHistory} from 'react-router/es6';
 
 import {trackEvent} from 'actions/diagnostics_actions.jsx';
 import * as GlobalActions from 'actions/global_actions.jsx';
@@ -103,7 +103,7 @@ export default class TutorialIntroScreens extends React.Component {
         const circles = this.createCircles();
 
         return (
-            <div id='tutorialIntroOne'>
+            <div>
                 <FormattedHTMLMessage
                     id='tutorial_intro.screenOne'
                     defaultMessage='<h3>Welcome to:</h3>
@@ -132,7 +132,6 @@ export default class TutorialIntroScreens extends React.Component {
                     values={{
                         link: (
                             <a
-                                id='appDownloadLink'
                                 href={link}
                                 target='_blank'
                                 rel='noopener noreferrer'
@@ -149,7 +148,6 @@ export default class TutorialIntroScreens extends React.Component {
 
             appDownloadImage = (
                 <a
-                    id='appDownloadImage'
                     href={link}
                     target='_blank'
                     rel='noopener noreferrer'
@@ -163,7 +161,7 @@ export default class TutorialIntroScreens extends React.Component {
         }
 
         return (
-            <div id='tutorialIntroTwo'>
+            <div>
                 <FormattedHTMLMessage
                     id='tutorial_intro.screenTwo'
                     defaultMessage='<h3>How Mattermost works:</h3>
@@ -185,7 +183,6 @@ export default class TutorialIntroScreens extends React.Component {
             if (team.type === Constants.INVITE_TEAM) {
                 inviteModalLink = (
                     <button
-                        id='tutorialIntroInvite'
                         className='intro-links color--link style--none'
                         onClick={GlobalActions.showInviteMemberModal}
                     >
@@ -198,7 +195,6 @@ export default class TutorialIntroScreens extends React.Component {
             } else {
                 inviteModalLink = (
                     <button
-                        id='tutorialIntroInvite'
                         className='intro-links color--link style--none'
                         onClick={GlobalActions.showGetTeamInviteLinkModal}
                     >
@@ -226,7 +222,7 @@ export default class TutorialIntroScreens extends React.Component {
         let supportInfo = null;
         if (global.window.mm_config.SupportEmail) {
             supportInfo = (
-                <p id='supportInfo'>
+                <p>
                     <FormattedMessage
                         id='tutorial_intro.support'
                         defaultMessage='Need anything, just email us at '
@@ -249,7 +245,7 @@ export default class TutorialIntroScreens extends React.Component {
         }
 
         return (
-            <div id='tutorialIntroThree'>
+            <div>
                 <h3>
                     <FormattedMessage
                         id='tutorial_intro.allSet'
@@ -279,7 +275,6 @@ export default class TutorialIntroScreens extends React.Component {
 
             circles.push(
                 <a
-                    id={'tutorialIntroCircle' + i}
                     href='#'
                     key={'circle' + i}
                     className={className}
@@ -302,10 +297,7 @@ export default class TutorialIntroScreens extends React.Component {
 
         return (
             <div className='tutorial-steps__container'>
-                <div
-                    id='tutorialIntroContent'
-                    className='tutorial__content'
-                >
+                <div className='tutorial__content'>
                     <div className='tutorial__steps'>
                         {screen}
                         <div className='tutorial__footer'>

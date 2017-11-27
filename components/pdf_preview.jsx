@@ -13,20 +13,7 @@ import FileInfoPreview from './file_info_preview.jsx';
 
 const MAX_PDF_PAGES = 5;
 
-export default class PDFPreview extends React.PureComponent {
-    static propTypes = {
-
-        /**
-        * Compare file types
-        */
-        fileInfo: PropTypes.object.isRequired,
-
-        /**
-        *  URL of pdf file to output and compare to update props url
-        */
-        fileUrl: PropTypes.string.isRequired
-    }
-
+export default class PDFPreview extends React.Component {
     constructor(props) {
         super(props);
 
@@ -123,7 +110,7 @@ export default class PDFPreview extends React.PureComponent {
     }
 
     static supports(fileInfo) {
-        return Boolean(fileInfo && fileInfo.extension && fileInfo.extension === 'pdf');
+        return fileInfo.extension === 'pdf';
     }
 
     render() {
@@ -158,10 +145,7 @@ export default class PDFPreview extends React.PureComponent {
 
             if (i < this.state.numPages - 1 && this.state.numPages > 1) {
                 pdfCanvases.push(
-                    <div
-                        key={'previewpdfspacer' + i}
-                        className='pdf-preview-spacer'
-                    />
+                    <div className='pdf-preview-spacer'/>
                 );
             }
         }
@@ -169,7 +153,6 @@ export default class PDFPreview extends React.PureComponent {
         if (this.state.pdf.numPages > MAX_PDF_PAGES) {
             pdfCanvases.push(
                 <a
-                    key='previewpdfmorepages'
                     href={this.props.fileUrl}
                     className='pdf-max-pages'
                 >
@@ -188,3 +171,8 @@ export default class PDFPreview extends React.PureComponent {
         );
     }
 }
+
+PDFPreview.propTypes = {
+    fileInfo: PropTypes.object.isRequired,
+    fileUrl: PropTypes.string.isRequired
+};

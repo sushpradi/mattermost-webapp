@@ -238,8 +238,6 @@ export function createDefaultIntroMessage(channel, centeredIntro) {
                     display_name: channel.display_name
                 }}
             />
-            {teamInviteLink}
-            {setHeaderButton}
             <br/>
         </div>
     );

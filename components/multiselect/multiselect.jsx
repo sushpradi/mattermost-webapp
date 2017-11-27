@@ -9,8 +9,6 @@ import ReactSelect from 'react-select';
 import Constants from 'utils/constants.jsx';
 import {localizeMessage} from 'utils/utils.jsx';
 
-import SaveButton from 'components/save_button.jsx';
-
 import MultiSelectList from './multiselect_list.jsx';
 
 const KeyCodes = Constants.KeyCodes;
@@ -79,16 +77,6 @@ export default class MultiSelect extends React.Component {
         this.refs.select.handleInputChange({target: {value: ''}});
         this.onInput('');
         this.refs.select.focus();
-
-        const submitImmediatelyOn = this.props.submitImmediatelyOn;
-        if (submitImmediatelyOn) {
-            for (let i = 0; i < submitImmediatelyOn.length; i++) {
-                if (submitImmediatelyOn[i] === value.id) {
-                    this.props.handleSubmit([value]);
-                    return;
-                }
-            }
-        }
     }
 
     onInput = (input) => {
@@ -120,11 +108,6 @@ export default class MultiSelect extends React.Component {
             this.onAdd(this.selected);
             break;
         }
-    }
-
-    handleOnClick = (e) => {
-        e.preventDefault();
-        this.props.handleSubmit();
     }
 
     onChange = (values) => {
@@ -248,12 +231,12 @@ export default class MultiSelect extends React.Component {
                             noResultsText={null}
                             placeholder={localizeMessage('multiselect.placeholder', 'Search and add members')}
                         />
-                        <SaveButton
-                            saving={this.props.saving}
-                            disabled={this.props.saving}
-                            onClick={this.handleOnClick}
-                            defaultMessage={buttonSubmitText}
-                        />
+                        <button
+                            className='btn btn-primary btn-sm'
+                            onClick={this.props.handleSubmit}
+                        >
+                            {buttonSubmitText}
+                        </button>
                     </div>
                     <div className='multi-select__help'>
                         {numRemainingText}
@@ -293,7 +276,5 @@ MultiSelect.propTypes = {
     noteText: PropTypes.node,
     maxValues: PropTypes.number,
     numRemainingText: PropTypes.node,
-    buttonSubmitText: PropTypes.node,
-    submitImmediatelyOn: PropTypes.arrayOf(PropTypes.string),
-    saving: PropTypes.bool
+    buttonSubmitText: PropTypes.node
 };

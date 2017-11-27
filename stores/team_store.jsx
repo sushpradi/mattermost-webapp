@@ -34,35 +34,30 @@ class TeamStoreClass extends EventEmitter {
 
         store.subscribe(() => {
             const newEntities = store.getState().entities.teams;
-            const entities = this.entities;
-            this.entities = newEntities;
-
             let doEmit = false;
 
-            if (newEntities.currentTeamId !== entities.currentTeamId) {
+            if (newEntities.currentTeamId !== this.entities.currentTeamId) {
                 doEmit = true;
             }
-
-            if (newEntities.teams !== entities.teams) {
+            if (newEntities.teams !== this.entities.teams) {
                 doEmit = true;
             }
-
-            if (newEntities.myMembers !== entities.myMembers) {
+            if (newEntities.myMembers !== this.entities.myMembers) {
                 doEmit = true;
                 this.emitUnreadChange();
             }
-
-            if (newEntities.membersInTeam !== entities.membersInTeam) {
+            if (newEntities.membersInTeam !== this.entities.membersInTeam) {
                 doEmit = true;
             }
-
-            if (newEntities.stats !== entities.stats) {
+            if (newEntities.stats !== this.entities.stats) {
                 this.emitStatsChange();
             }
 
             if (doEmit) {
                 this.emitChange();
             }
+
+            this.entities = newEntities;
         });
     }
 

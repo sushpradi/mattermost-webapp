@@ -37,7 +37,7 @@ export default class ResetPasswordModal extends React.Component {
         e.preventDefault();
         const password = this.refs.password.value;
 
-        const passwordErr = Utils.isValidPassword(password, Utils.getPasswordConfig());
+        const passwordErr = Utils.isValidPassword(password);
         if (passwordErr) {
             this.setState({serverError: passwordErr});
             return;
@@ -140,8 +140,8 @@ export default class ResetPasswordModal extends React.Component {
                             onClick={this.doCancel}
                         >
                             <FormattedMessage
-                                id='admin.reset_password.cancel'
-                                defaultMessage='Cancel'
+                                id='admin.reset_password.close'
+                                defaultMessage='Close'
                             />
                         </button>
                         <button
@@ -151,8 +151,8 @@ export default class ResetPasswordModal extends React.Component {
                             tabIndex='2'
                         >
                             <FormattedMessage
-                                id='admin.reset_password.reset'
-                                defaultMessage='Reset'
+                                id='admin.reset_password.select'
+                                defaultMessage='Select'
                             />
                         </button>
                     </Modal.Footer>

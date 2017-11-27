@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
-import {browserHistory} from 'react-router';
+import {browserHistory} from 'react-router/es6';
 
 import {Client4} from 'mattermost-redux/client';
 import {searchProfilesNotInCurrentTeam} from 'mattermost-redux/selectors/entities/users';
@@ -51,9 +51,7 @@ export default class AddUsersToTeam extends React.Component {
             users: Object.assign([], UserStore.getProfileListNotInTeam(TeamStore.getCurrentId(), true)),
             values: [],
             show: true,
-            search: false,
-            saving: false,
-            addError: null
+            search: false
         };
     }
 
@@ -85,18 +83,6 @@ export default class AddUsersToTeam extends React.Component {
         }
     }
 
-    handleResponse(err) {
-        let addError = null;
-        if (err && err.message) {
-            addError = err.message;
-        }
-
-        this.setState({
-            saving: false,
-            addError
-        });
-    }
-
     handleSubmit(e) {
         if (e) {
             e.preventDefault();
@@ -107,19 +93,9 @@ export default class AddUsersToTeam extends React.Component {
             return;
         }
 
-        this.setState({saving: true});
+        addUsersToTeam(TeamStore.getCurrentId(), userIds);
 
-        addUsersToTeam(
-            TeamStore.getCurrentId(),
-            userIds,
-            () => {
-                this.handleResponse();
-                this.handleHide();
-            },
-            (err) => {
-                this.handleResponse(err);
-            }
-        );
+        this.handleHide();
     }
 
     addValue(value) {
@@ -242,11 +218,6 @@ export default class AddUsersToTeam extends React.Component {
             users = this.state.users.filter((user) => user.delete_at === 0);
         }
 
-        let addError = null;
-        if (this.state.addError) {
-            addError = (<label className='has-error control-label'>{this.state.addError}</label>);
-        }
-
         return (
             <Modal
                 dialogClassName={'more-modal more-direct-channels'}
@@ -268,7 +239,6 @@ export default class AddUsersToTeam extends React.Component {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {addError}
                     <MultiSelect
                         key='addUsersToTeamKey'
                         options={users}
@@ -284,7 +254,6 @@ export default class AddUsersToTeam extends React.Component {
                         maxValues={MAX_SELECTABLE_VALUES}
                         numRemainingText={numRemainingText}
                         buttonSubmitText={buttonSubmitText}
-                        saving={this.state.saving}
                     />
                 </Modal.Body>
             </Modal>

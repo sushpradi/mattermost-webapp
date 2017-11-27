@@ -12,20 +12,7 @@ import * as Utils from 'utils/utils.jsx';
 
 import FileInfoPreview from './file_info_preview.jsx';
 
-export default class AudioVideoPreview extends React.PureComponent {
-    static propTypes = {
-
-        /**
-        * Compare file types
-        */
-        fileInfo: PropTypes.object.isRequired,
-
-        /**
-        *  URL of pdf file to output and compare to update props url
-        */
-        fileUrl: PropTypes.string.isRequired
-    }
-
+export default class AudioVideoPreview extends React.Component {
     constructor(props) {
         super(props);
 
@@ -123,3 +110,8 @@ export default class AudioVideoPreview extends React.PureComponent {
         );
     }
 }
+
+AudioVideoPreview.propTypes = {
+    fileInfo: PropTypes.object.isRequired,
+    fileUrl: PropTypes.string.isRequired
+};

@@ -9,8 +9,10 @@ import {FormattedMessage} from 'react-intl';
 import 'bootstrap';
 
 import * as GlobalActions from 'actions/global_actions.jsx';
+import {getFlaggedPosts, getPinnedPosts} from 'actions/post_actions.jsx';
 import * as WebrtcActions from 'actions/webrtc_actions.jsx';
 import AppDispatcher from 'dispatcher/app_dispatcher.jsx';
+import SearchStore from 'stores/search_store.jsx';
 import WebrtcStore from 'stores/webrtc_store.jsx';
 
 import * as ChannelUtils from 'utils/channel_utils.jsx';
@@ -28,12 +30,10 @@ import EditChannelHeaderModal from 'components/edit_channel_header_modal';
 import EditChannelPurposeModal from 'components/edit_channel_purpose_modal';
 import MessageWrapper from 'components/message_wrapper.jsx';
 import PopoverListMembers from 'components/popover_list_members';
-import RenameChannelModal from 'components/rename_channel_modal';
-import NavbarSearchBox from 'components/search_bar';
+import RenameChannelModal from 'components/rename_channel_modal.jsx';
+import NavbarSearchBox from 'components/search_bar.jsx';
 import StatusIcon from 'components/status_icon.jsx';
 import ToggleModalButton from 'components/toggle_modal_button.jsx';
-
-import Pluggable from 'plugins/pluggable';
 
 const PreReleaseFeatures = Constants.PRE_RELEASE_FEATURES;
 
@@ -49,17 +49,10 @@ export default class ChannelHeader extends React.Component {
         dmUserStatus: PropTypes.object,
         dmUserIsInCall: PropTypes.bool,
         enableFormatting: PropTypes.bool.isRequired,
-        rhsState: PropTypes.oneOf(
-            Object.values(RHSStates)
-        ),
         actions: PropTypes.shape({
             leaveChannel: PropTypes.func.isRequired,
             favoriteChannel: PropTypes.func.isRequired,
-            unfavoriteChannel: PropTypes.func.isRequired,
-            showFlaggedPosts: PropTypes.func.isRequired,
-            showPinnedPosts: PropTypes.func.isRequired,
-            showMentions: PropTypes.func.isRequired,
-            closeRightHandSide: PropTypes.func.isRequired
+            unfavoriteChannel: PropTypes.func.isRequired
         }).isRequired
     }
 
@@ -76,6 +69,7 @@ export default class ChannelHeader extends React.Component {
             showEditChannelPurposeModal: false,
             showMembersModal: false,
             showRenameChannelModal: false,
+            rhsState: '',
             isBusy: WebrtcStore.isBusy()
         };
     }
@@ -83,13 +77,27 @@ export default class ChannelHeader extends React.Component {
     componentDidMount() {
         WebrtcStore.addChangedListener(this.onWebrtcChange);
         WebrtcStore.addBusyListener(this.onBusy);
+        SearchStore.addSearchChangeListener(this.onSearchChange);
         document.addEventListener('keydown', this.handleShortcut);
     }
 
     componentWillUnmount() {
         WebrtcStore.removeChangedListener(this.onWebrtcChange);
         WebrtcStore.removeBusyListener(this.onBusy);
+        SearchStore.removeSearchChangeListener(this.onSearchChange);
         document.removeEventListener('keydown', this.handleShortcut);
+    }
+
+    onSearchChange = () => {
+        let rhsState = '';
+        if (SearchStore.isPinnedPosts) {
+            rhsState = RHSStates.PIN;
+        } else if (SearchStore.isFlaggedPosts) {
+            rhsState = RHSStates.FLAG;
+        } else if (SearchStore.isMentionSearch) {
+            rhsState = RHSStates.MENTION;
+        }
+        this.setState({rhsState});
     }
 
     onWebrtcChange = () => {
@@ -118,28 +126,28 @@ export default class ChannelHeader extends React.Component {
 
     searchMentions = (e) => {
         e.preventDefault();
-        if (this.props.rhsState === RHSStates.MENTION) {
-            this.props.actions.closeRightHandSide();
+        if (this.state.rhsState === RHSStates.MENTION) {
+            GlobalActions.toggleSideBarAction(false);
         } else {
-            this.props.actions.showMentions();
+            GlobalActions.emitSearchMentionsEvent(this.props.currentUser);
         }
     }
 
     getPinnedPosts = (e) => {
         e.preventDefault();
-        if (this.props.rhsState === RHSStates.PIN) {
-            this.props.actions.closeRightHandSide();
+        if (this.state.rhsState === RHSStates.PIN) {
+            GlobalActions.toggleSideBarAction(false);
         } else {
-            this.props.actions.showPinnedPosts();
+            getPinnedPosts(this.props.channel.id);
         }
     }
 
     getFlagged = (e) => {
         e.preventDefault();
-        if (this.props.rhsState === RHSStates.FLAG) {
-            this.props.actions.closeRightHandSide();
+        if (this.state.rhsState === RHSStates.FLAG) {
+            GlobalActions.toggleSideBarAction(false);
         } else {
-            this.props.actions.showFlaggedPosts();
+            getFlaggedPosts();
         }
     }
 
@@ -168,7 +176,7 @@ export default class ChannelHeader extends React.Component {
 
     initWebrtc = (contactId, isOnline) => {
         if (isOnline && !this.state.isBusy) {
-            this.props.actions.closeRightHandSide();
+            GlobalActions.emitCloseRightHandSide();
             WebrtcActions.initWebrtc(contactId, true);
         }
     }
@@ -256,19 +264,7 @@ export default class ChannelHeader extends React.Component {
             const dmUserStatus = this.props.dmUserStatus.status;
 
             const teammateId = Utils.getUserIdFromChannelName(channel);
-            if (this.props.currentUser.id === teammateId) {
-                channelTitle = (
-                    <FormattedMessage
-                        id='channel_header.directchannel.you'
-                        defaultMessage='{displayname} (you) '
-                        values={{
-                            displayname: Utils.displayUsername(teammateId)
-                        }}
-                    />
-                );
-            } else {
-                channelTitle = Utils.displayUsername(teammateId) + ' ';
-            }
+            channelTitle = Utils.displayUsername(teammateId);
 
             const webrtcEnabled = global.mm_config.EnableWebrtc === 'true' && userMedia && Utils.isFeatureEnabled(PreReleaseFeatures.WEBRTC_PREVIEW);
 
@@ -345,7 +341,7 @@ export default class ChannelHeader extends React.Component {
 
         const dropdownContents = [];
         if (isDirect) {
-            dropdownContents.push(
+            /*dropdownContents.push(
                 <li
                     key='edit_header_direct'
                     role='presentation'
@@ -362,9 +358,9 @@ export default class ChannelHeader extends React.Component {
                         />
                     </ToggleModalButton>
                 </li>
-            );
+            );*/
         } else if (isGroup) {
-            dropdownContents.push(
+            /*dropdownContents.push(
                 <li
                     key='edit_header_direct'
                     role='presentation'
@@ -381,7 +377,7 @@ export default class ChannelHeader extends React.Component {
                         />
                     </ToggleModalButton>
                 </li>
-            );
+            );*/
 
             dropdownContents.push(
                 <li
@@ -565,7 +561,7 @@ export default class ChannelHeader extends React.Component {
                     />
                 );
 
-                dropdownContents.push(
+                /*dropdownContents.push(
                     <li
                         key='set_channel_header'
                         role='presentation'
@@ -582,9 +578,9 @@ export default class ChannelHeader extends React.Component {
                             />
                         </ToggleModalButton>
                     </li>
-                );
+                );*/
 
-                dropdownContents.push(
+                /*dropdownContents.push(
                     <li
                         key='set_channel_purpose'
                         role='presentation'
@@ -601,9 +597,9 @@ export default class ChannelHeader extends React.Component {
                             />
                         </button>
                     </li>
-                );
+                );*/
 
-                dropdownContents.push(
+                /*dropdownContents.push(
                     <li
                         key='rename_channel'
                         role='presentation'
@@ -620,10 +616,10 @@ export default class ChannelHeader extends React.Component {
                             />
                         </button>
                     </li>
-                );
+                );*/
             }
 
-            if (ChannelUtils.showDeleteOptionForCurrentUser(channel, isChannelAdmin, isTeamAdmin, isSystemAdmin)) {
+            /*if (ChannelUtils.showDeleteOptionForCurrentUser(channel, isChannelAdmin, isTeamAdmin, isSystemAdmin)) {
                 dropdownContents.push(
                     <li
                         key='delete_channel'
@@ -642,7 +638,7 @@ export default class ChannelHeader extends React.Component {
                         </ToggleModalButton>
                     </li>
                 );
-            }
+            }*/
 
             if (!this.props.isDefault) {
                 dropdownContents.push(
@@ -682,14 +678,8 @@ export default class ChannelHeader extends React.Component {
                     status={channel.status}
                 />
             );
-
             dmHeaderTextStatus = (
-                <span className='header-status__text'>
-                    <FormattedMessage
-                        id={`status_dropdown.set_${channel.status}`}
-                        defaultMessage={Utils.toTitleCase(channel.status)}
-                    />
-                </span>
+                <span className='header-status__text'>{Utils.toTitleCase(channel.status)}</span>
             );
         }
 
@@ -700,7 +690,7 @@ export default class ChannelHeader extends React.Component {
                 headerTextElement = (
                     <div
                         id='channelHeaderDescription'
-                        className='channel-header__description'
+                        className='channel-header__description light'
                     >
                         {dmHeaderIconStatus}
                         {dmHeaderTextStatus}
@@ -832,7 +822,7 @@ export default class ChannelHeader extends React.Component {
         }
 
         let pinnedIconClass = 'channel-header__icon';
-        if (this.props.rhsState === RHSStates.PIN) {
+        if (this.state.rhsState === RHSStates.PIN) {
             pinnedIconClass += ' active';
         }
 
@@ -863,7 +853,7 @@ export default class ChannelHeader extends React.Component {
                                         id='channelHeaderTitle'
                                         className='heading'
                                     >
-                                        {channelTitle}
+                                        {channelTitle + ' '}
                                     </strong>
                                     <span
                                         id='channelHeaderDropdownIcon'
@@ -887,9 +877,6 @@ export default class ChannelHeader extends React.Component {
                     </div>
                     <div className='flex-child'>
                         {popoverListMembers}
-                    </div>
-                    <div className='flex-child'>
-                        <Pluggable pluggableName='ChannelHeaderButton'/>
                     </div>
                     <div className='flex-child'>
                         <OverlayTrigger

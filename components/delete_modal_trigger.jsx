@@ -8,23 +8,23 @@ import Constants from 'utils/constants.jsx';
 
 import ConfirmModal from './confirm_modal.jsx';
 
-export default class DeleteModalTrigger extends React.PureComponent {
-    static propTypes = {
-        onDelete: PropTypes.func.isRequired
-    }
-
+export default class DeleteModalTrigger extends React.Component {
     constructor(props) {
         super(props);
         if (this.constructor === DeleteModalTrigger) {
             throw new TypeError('Can not construct abstract class.');
         }
+        this.handleConfirm = this.handleConfirm.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
+        this.handleOpenModal = this.handleOpenModal.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
 
         this.state = {
             showDeleteModal: false
         };
     }
 
-    handleOpenModal = (e) => {
+    handleOpenModal(e) {
         e.preventDefault();
 
         this.setState({
@@ -32,17 +32,17 @@ export default class DeleteModalTrigger extends React.PureComponent {
         });
     }
 
-    handleConfirm = () => {
+    handleConfirm() {
         this.props.onDelete();
     }
 
-    handleCancel = () => {
+    handleCancel() {
         this.setState({
             showDeleteModal: false
         });
     }
 
-    handleKeyDown = (e) => {
+    handleKeyDown(e) {
         if (e.keyCode === Constants.KeyCodes.ENTER) {
             this.handleConfirm(e);
         }
@@ -51,12 +51,12 @@ export default class DeleteModalTrigger extends React.PureComponent {
     render() {
         return (
             <span>
-                <button
-                    className='color--link style--none'
+                <a
+                    href='#'
                     onClick={this.handleOpenModal}
                 >
                     { this.triggerTitle }
-                </button>
+                </a>
                 <ConfirmModal
                     show={this.state.showDeleteModal}
                     title={this.modalTitle}
@@ -70,3 +70,7 @@ export default class DeleteModalTrigger extends React.PureComponent {
         );
     }
 }
+
+DeleteModalTrigger.propTypes = {
+    onDelete: PropTypes.func.isRequired
+};

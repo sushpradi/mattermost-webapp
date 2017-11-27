@@ -10,7 +10,8 @@ import AddCommand from './add_command.jsx';
 
 function mapStateToProps(state, ownProps) {
     return {
-        ...ownProps
+        ...ownProps,
+        addCommandRequest: state.requests.integrations.addCommand
     };
 }
 

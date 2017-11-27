@@ -82,8 +82,8 @@ export default class TeamAnalytics extends React.Component {
         AdminActions.getStandardAnalytics(id);
         AdminActions.getPostsPerDayAnalytics(id);
         AdminActions.getUsersPerDayAnalytics(id);
-        const {data: recentlyActiveUsers} = await this.props.actions.getProfilesInTeam(id, 0, General.PROFILE_CHUNK_SIZE, 'last_activity_at');
-        const {data: newUsers} = await this.props.actions.getProfilesInTeam(id, 0, General.PROFILE_CHUNK_SIZE, 'create_at');
+        const recentlyActiveUsers = await this.props.actions.getProfilesInTeam(id, 0, General.PROFILE_CHUNK_SIZE, 'last_activity_at');
+        const newUsers = await this.props.actions.getProfilesInTeam(id, 0, General.PROFILE_CHUNK_SIZE, 'create_at');
 
         this.setState({
             recentlyActiveUsers,
@@ -181,8 +181,13 @@ export default class TeamAnalytics extends React.Component {
                             />
                         }
                         data={postCountsDay}
-                        width={740}
-                        height={225}
+                        options={{
+                            legend: {
+                                display: false
+                            }
+                        }}
+                        width='740'
+                        height='225'
                     />
                 </div>
             );
@@ -198,8 +203,13 @@ export default class TeamAnalytics extends React.Component {
                             />
                         }
                         data={userCountsWithPostsDay}
-                        width={740}
-                        height={225}
+                        options={{
+                            legend: {
+                                display: false
+                            }
+                        }}
+                        width='740'
+                        height='225'
                     />
                 </div>
             );

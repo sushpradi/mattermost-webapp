@@ -184,15 +184,15 @@ export default class InstalledOutgoingWebhook extends React.PureComponent {
         if (this.props.canChange) {
             actions = (
                 <div className='item-actions'>
-                    <button
-                        className='style--none color--link'
+                    <a
+                        href='#'
                         onClick={this.handleRegenToken}
                     >
                         <FormattedMessage
                             id='installed_integrations.regenToken'
                             defaultMessage='Regen Token'
                         />
-                    </button>
+                    </a>
                     {' - '}
                     <Link to={`/${this.props.team.name}/integrations/outgoing_webhooks/edit?id=${outgoingWebhook.id}`}>
                         <FormattedMessage

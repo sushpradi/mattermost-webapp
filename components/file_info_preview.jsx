@@ -7,19 +7,18 @@ import React from 'react';
 import * as FileUtils from 'utils/file_utils';
 import * as Utils from 'utils/utils.jsx';
 
-export default class FileInfoPreview extends React.PureComponent {
-    static propTypes = {
+export default class FileInfoPreview extends React.Component {
+    shouldComponentUpdate(nextProps) {
+        if (nextProps.fileUrl !== this.props.fileUrl) {
+            return true;
+        }
 
-        /**
-         * Object with info about file
-         */
-        fileInfo: PropTypes.object.isRequired,
+        if (!Utils.areObjectsEqual(nextProps.fileInfo, this.props.fileInfo)) {
+            return true;
+        }
 
-        /**
-         * String containing file URL
-         */
-        fileUrl: PropTypes.string.isRequired
-    };
+        return false;
+    }
 
     render() {
         const fileInfo = this.props.fileInfo;
@@ -69,3 +68,8 @@ export default class FileInfoPreview extends React.PureComponent {
         );
     }
 }
+
+FileInfoPreview.propTypes = {
+    fileInfo: PropTypes.object.isRequired,
+    fileUrl: PropTypes.string.isRequired
+};

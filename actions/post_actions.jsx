@@ -1,24 +1,23 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {browserHistory} from 'react-router';
+import {browserHistory} from 'react-router/es6';
 import {batchActions} from 'redux-batched-actions';
 
 import {PostTypes} from 'mattermost-redux/action_types';
 import {getMyChannelMember} from 'mattermost-redux/actions/channels';
 import * as PostActions from 'mattermost-redux/actions/posts';
+import {Client4} from 'mattermost-redux/client';
 import * as Selectors from 'mattermost-redux/selectors/entities/posts';
 
 import {sendDesktopNotification} from 'actions/notification_actions.jsx';
 import {loadNewDMIfNeeded, loadNewGMIfNeeded} from 'actions/user_actions.jsx';
-import * as RhsActions from 'actions/views/rhs';
 import AppDispatcher from 'dispatcher/app_dispatcher.jsx';
 import ChannelStore from 'stores/channel_store.jsx';
 import PostStore from 'stores/post_store.jsx';
 import store from 'stores/redux_store.jsx';
 import TeamStore from 'stores/team_store.jsx';
-
-import {getSelectedPostId} from 'selectors/rhs';
+import UserStore from 'stores/user_store.jsx';
 
 import {ActionTypes, Constants} from 'utils/constants.jsx';
 import {EMOJI_PATTERN} from 'utils/emoticons.jsx';
@@ -103,6 +102,54 @@ export function unflagPost(postId) {
     PostActions.unflagPost(postId)(dispatch, getState);
 }
 
+export function getFlaggedPosts() {
+    Client4.getFlaggedPosts(UserStore.getCurrentId(), '', TeamStore.getCurrentId()).then(
+        (data) => {
+            AppDispatcher.handleServerAction({
+                type: ActionTypes.RECEIVED_SEARCH_TERM,
+                term: null,
+                do_search: false,
+                is_mention_search: false
+            });
+
+            AppDispatcher.handleServerAction({
+                type: ActionTypes.RECEIVED_SEARCH,
+                results: data,
+                is_flagged_posts: true,
+                is_pinned_posts: false
+            });
+
+            PostActions.getProfilesAndStatusesForPosts(data.posts, dispatch, getState);
+        }
+    ).catch(
+        () => {} //eslint-disable-line no-empty-function
+    );
+}
+
+export function getPinnedPosts(channelId = ChannelStore.getCurrentId()) {
+    Client4.getPinnedPosts(channelId).then(
+        (data) => {
+            AppDispatcher.handleServerAction({
+                type: ActionTypes.RECEIVED_SEARCH_TERM,
+                term: null,
+                do_search: false,
+                is_mention_search: false
+            });
+
+            AppDispatcher.handleServerAction({
+                type: ActionTypes.RECEIVED_SEARCH,
+                results: {...data, channelId},
+                is_flagged_posts: false,
+                is_pinned_posts: true
+            });
+
+            PostActions.getProfilesAndStatusesForPosts(data.posts, dispatch, getState);
+        }
+    ).catch(
+        () => {} //eslint-disable-line no-empty-function
+    );
+}
+
 export function addReaction(channelId, postId, emojiName) {
     PostActions.addReaction(postId, emojiName)(dispatch, getState);
 }
@@ -111,7 +158,7 @@ export function removeReaction(channelId, postId, emojiName) {
     PostActions.removeReaction(postId, emojiName)(dispatch, getState);
 }
 
-export async function createPost(post, files, success) {
+export function createPost(post, files, success) {
     // parse message and emit emoji event
     const emojis = post.message.match(EMOJI_PATTERN);
     if (emojis) {
@@ -121,29 +168,34 @@ export async function createPost(post, files, success) {
         }
     }
 
-    await PostActions.createPost(post, files)(dispatch, getState);
-    if (post.root_id) {
-        PostStore.storeCommentDraft(post.root_id, null);
-    } else {
-        PostStore.storeDraft(post.channel_id, null);
-    }
+    PostActions.createPost(post, files)(dispatch, getState).then(() => {
+        if (post.root_id) {
+            PostStore.storeCommentDraft(post.root_id, null);
+        } else {
+            PostStore.storeDraft(post.channel_id, null);
+        }
 
-    if (success) {
-        success();
-    }
+        if (success) {
+            success();
+        }
+    });
 }
 
-export async function updatePost(post, success) {
-    const {data, error: err} = await PostActions.editPost(post)(dispatch, getState);
-    if (data && success) {
-        success();
-    } else if (err) {
-        AppDispatcher.handleServerAction({
-            type: ActionTypes.RECEIVED_ERROR,
-            err: {id: err.server_error_id, ...err},
-            method: 'editPost'
-        });
-    }
+export function updatePost(post, success) {
+    PostActions.editPost(post)(dispatch, getState).then(
+        (data) => {
+            if (data && success) {
+                success();
+            } else {
+                const serverError = getState().requests.posts.editPost.error;
+                AppDispatcher.handleServerAction({
+                    type: ActionTypes.RECEIVED_ERROR,
+                    err: {id: serverError.server_error_id, ...serverError},
+                    method: 'editPost'
+                });
+            }
+        }
+    );
 }
 
 export function emitEmojiPosted(emoji) {
@@ -153,7 +205,7 @@ export function emitEmojiPosted(emoji) {
     });
 }
 
-export async function deletePost(channelId, post, success) {
+export function deletePost(channelId, post, success) {
     const {currentUserId} = getState().entities.users;
 
     let hardDelete = false;
@@ -161,36 +213,62 @@ export async function deletePost(channelId, post, success) {
         hardDelete = true;
     }
 
-    await PostActions.deletePost(post, hardDelete)(dispatch, getState);
+    PostActions.deletePost(post, hardDelete)(dispatch, getState).then(
+        () => {
+            if (post.id === getState().views.rhs.selectedPostId) {
+                dispatch({
+                    type: ActionTypes.SELECT_POST,
+                    postId: '',
+                    channelId: ''
+                });
+            }
 
-    if (post.id === getSelectedPostId(getState())) {
-        dispatch({
-            type: ActionTypes.SELECT_POST,
-            postId: '',
-            channelId: ''
-        });
-    }
+            dispatch({
+                type: PostTypes.REMOVE_POST,
+                data: post
+            });
 
-    dispatch({
-        type: PostTypes.REMOVE_POST,
-        data: post
-    });
+            // Needed for search store
+            AppDispatcher.handleViewAction({
+                type: Constants.ActionTypes.REMOVE_POST,
+                post
+            });
 
-    // Needed for search store
-    AppDispatcher.handleViewAction({
-        type: Constants.ActionTypes.REMOVE_POST,
-        post
-    });
+            const {focusedPostId} = getState().views.channel;
+            const channel = getState().entities.channels.channels[post.channel_id];
+            if (post.id === focusedPostId && channel) {
+                browserHistory.push(TeamStore.getCurrentTeamRelativeUrl() + '/channels/' + channel.name);
+            }
 
-    const {focusedPostId} = getState().views.channel;
-    const channel = getState().entities.channels.channels[post.channel_id];
-    if (post.id === focusedPostId && channel) {
-        browserHistory.push(TeamStore.getCurrentTeamRelativeUrl() + '/channels/' + channel.name);
-    }
+            if (success) {
+                success();
+            }
+        }
+    );
+}
 
-    if (success) {
-        success();
-    }
+export function performSearch(terms, isMentionSearch, success, error) {
+    Client4.searchPosts(TeamStore.getCurrentId(), terms, isMentionSearch).then(
+        (data) => {
+            AppDispatcher.handleServerAction({
+                type: ActionTypes.RECEIVED_SEARCH,
+                results: data,
+                is_mention_search: isMentionSearch
+            });
+
+            PostActions.getProfilesAndStatusesForPosts(data.posts, dispatch, getState);
+
+            if (success) {
+                success(data);
+            }
+        }
+    ).catch(
+        (err) => {
+            if (error) {
+                error(err);
+            }
+        }
+    );
 }
 
 const POST_INCREASE_AMOUNT = Constants.POST_CHUNK_SIZE / 2;
@@ -223,13 +301,12 @@ export function increasePostVisibility(channelId, focusedPostId) {
 
         const page = Math.floor(currentPostVisibility / POST_INCREASE_AMOUNT);
 
-        let result;
+        let posts;
         if (focusedPostId) {
-            result = await PostActions.getPostsBefore(channelId, focusedPostId, page, POST_INCREASE_AMOUNT)(dispatch, getState);
+            posts = await PostActions.getPostsBefore(channelId, focusedPostId, page, POST_INCREASE_AMOUNT)(dispatch, getState);
         } else {
-            result = await PostActions.getPosts(channelId, page, POST_INCREASE_AMOUNT)(doDispatch, doGetState);
+            posts = await PostActions.getPosts(channelId, page, POST_INCREASE_AMOUNT)(doDispatch, doGetState);
         }
-        const posts = result.data;
 
         doDispatch({
             type: ActionTypes.LOADING_POSTS,
@@ -242,8 +319,11 @@ export function increasePostVisibility(channelId, focusedPostId) {
 }
 
 export function searchForTerm(term) {
-    dispatch(RhsActions.updateSearchTerms(term));
-    dispatch(RhsActions.showSearchResults());
+    AppDispatcher.handleServerAction({
+        type: ActionTypes.RECEIVED_SEARCH_TERM,
+        term,
+        do_search: true
+    });
 }
 
 export function pinPost(postId) {
@@ -270,15 +350,4 @@ export function unpinPost(postId) {
 
 export function doPostAction(postId, actionId) {
     PostActions.doPostAction(postId, actionId)(dispatch, getState);
-}
-
-export function setEditingPost(postId = '', commentsCount = 0, refocusId = '', title = '') {
-    return async (doDispatch, doGetState) => {
-        doDispatch({
-            type: ActionTypes.SET_EDITING_POST,
-            data: {postId, commentsCount, refocusId, title}
-        }, doGetState);
-
-        return {data: true};
-    };
 }

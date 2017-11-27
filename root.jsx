@@ -7,7 +7,7 @@ require('perfect-scrollbar/jquery')($);
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
-import {Router, browserHistory} from 'react-router';
+import {Router, browserHistory} from 'react-router/es6';
 import PDFJS from 'pdfjs-dist';
 
 import * as Websockets from 'actions/websocket_actions.jsx';
@@ -64,11 +64,11 @@ function preRenderSetup(callwhendone) {
         loadMeAndConfig(() => d1.resolve());
     } else {
         getClientConfig()(store.dispatch, store.getState).then(
-            ({data: config}) => {
+            (config) => {
                 global.window.mm_config = config;
 
                 getLicenseConfig()(store.dispatch, store.getState).then(
-                    ({data: license}) => {
+                    (license) => {
                         global.window.mm_license = license;
                         d1.resolve();
                     }

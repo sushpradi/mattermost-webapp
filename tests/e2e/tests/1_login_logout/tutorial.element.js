@@ -13,13 +13,10 @@ module.exports = {
             .login(testUser.email, testUser.password);
     },
     after: (client) => client.end(),
-    'Test tutorial intro screen pages': (client) => {
+    'Test tutorial steps action': (client) => {
         const tutorialPage = client.page.tutorialPage();
 
         tutorialPage.navigate()
-            .navigateToScreenTwo()
-            .navigateToScreenThree()
-            .navigateToScreenOne()
-            .navigateWithNextButton();
+            .nextTutorial();
     }
 };

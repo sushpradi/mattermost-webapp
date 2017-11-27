@@ -4,7 +4,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {FormattedMessage} from 'react-intl';
-import {Link} from 'react-router';
+import {Link} from 'react-router/es6';
 
 import BackstageHeader from 'components/backstage/components/backstage_header.jsx';
 
@@ -74,6 +74,7 @@ export default class AbstractCommand extends React.PureComponent {
             autocompleteHint: command.auto_complete_hint || '',
             autocompleteDescription: command.auto_complete_desc || '',
             saving: false,
+            serverError: this.props.serverError || '',
             clientError: null
         };
     }
@@ -87,6 +88,7 @@ export default class AbstractCommand extends React.PureComponent {
 
         this.setState({
             saving: true,
+            serverError: '',
             clientError: ''
         });
 
@@ -346,7 +348,7 @@ export default class AbstractCommand extends React.PureComponent {
                             >
                                 <FormattedMessage
                                     id='add_command.displayName'
-                                    defaultMessage='Title'
+                                    defaultMessage='Display Name'
                                 />
                             </label>
                             <div className='col-md-5 col-sm-8'>
@@ -361,7 +363,7 @@ export default class AbstractCommand extends React.PureComponent {
                                 <div className='form__help'>
                                     <FormattedMessage
                                         id='add_command.displayName.help'
-                                        defaultMessage='Choose a title to be displayed on the slash command settings page. Maximum 64 characters.'
+                                        defaultMessage='Display name for your slash command made of up to 64 characters.'
                                     />
                                 </div>
                             </div>
@@ -592,7 +594,7 @@ export default class AbstractCommand extends React.PureComponent {
                         <div className='backstage-form__footer'>
                             <FormError
                                 type='backstage'
-                                errors={[this.props.serverError, this.state.clientError]}
+                                errors={[this.state.serverError, this.state.clientError]}
                             />
                             <Link
                                 className='btn btn-sm'

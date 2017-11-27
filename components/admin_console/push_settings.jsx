@@ -22,10 +22,12 @@ export default class PushSettings extends AdminSettings {
         super(props);
 
         this.canSave = this.canSave.bind(this);
+
         this.handleAgreeChange = this.handleAgreeChange.bind(this);
+
         this.getConfigFromState = this.getConfigFromState.bind(this);
+
         this.renderSettings = this.renderSettings.bind(this);
-        this.handleDropdownChange = this.handleDropdownChange.bind(this);
     }
 
     canSave() {
@@ -38,7 +40,7 @@ export default class PushSettings extends AdminSettings {
         });
     }
 
-    handleDropdownChange(id, value) {
+    handleChange(id, value) {
         if (id === 'pushNotificationServerType') {
             this.setState({
                 agree: false
@@ -55,7 +57,7 @@ export default class PushSettings extends AdminSettings {
             }
         }
 
-        this.handleChange(id, value);
+        super.handleChange(id, value);
     }
 
     getConfigFromState(config) {
@@ -184,7 +186,7 @@ export default class PushSettings extends AdminSettings {
                         />
                     }
                     value={this.state.pushNotificationServerType}
-                    onChange={this.handleDropdownChange}
+                    onChange={this.handleChange}
                     helpText={sendHelpText}
                 />
                 {tosCheckbox}
@@ -216,7 +218,7 @@ export default class PushSettings extends AdminSettings {
                         />
                     }
                     value={this.state.pushNotificationContents}
-                    onChange={this.handleDropdownChange}
+                    onChange={this.handleChange}
                     disabled={this.state.pushNotificationServerType === PUSH_NOTIFICATIONS_OFF}
                     helpText={
                         <FormattedHTMLMessage

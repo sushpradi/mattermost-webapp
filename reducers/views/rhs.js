@@ -3,9 +3,9 @@
 
 import {combineReducers} from 'redux';
 
-import {PostTypes, SearchTypes} from 'mattermost-redux/action_types';
+import {PostTypes} from 'mattermost-redux/action_types';
 
-import {ActionTypes, RHSStates} from 'utils/constants.jsx';
+import {ActionTypes} from 'utils/constants.jsx';
 
 function selectedPostId(state = '', action) {
     switch (action.type) {
@@ -16,20 +16,25 @@ function selectedPostId(state = '', action) {
             return '';
         }
         return state;
-    case ActionTypes.UPDATE_RHS_STATE:
-        return '';
     default:
         return state;
     }
 }
 
-function selectedChannelId(state = '', action) {
+function selectedPostChannelId(state = '', action) {
     switch (action.type) {
     case ActionTypes.SELECT_POST:
         return action.channelId;
-    case ActionTypes.UPDATE_RHS_STATE:
-        if (action.state === RHSStates.PIN) {
-            return action.channelId;
+    default:
+        return state;
+    }
+}
+
+function fromSearch(state = '', action) {
+    switch (action.type) {
+    case ActionTypes.SELECT_POST:
+        if (action.from_search) {
+            return action.from_search;
         }
         return '';
     default:
@@ -37,44 +42,24 @@ function selectedChannelId(state = '', action) {
     }
 }
 
-function previousRhsState(state = null, action) {
+function fromFlaggedPosts(state = false, action) {
     switch (action.type) {
     case ActionTypes.SELECT_POST:
-        if (action.previousRhsState) {
-            return action.previousRhsState;
+        if (action.from_flagged_posts) {
+            return action.from_flagged_posts;
         }
-        return null;
+        return false;
     default:
         return state;
     }
 }
 
-function rhsState(state = null, action) {
+function fromPinnedPosts(state = false, action) {
     switch (action.type) {
-    case ActionTypes.UPDATE_RHS_STATE:
-        return action.state;
     case ActionTypes.SELECT_POST:
-        return null;
-    default:
-        return state;
-    }
-}
-
-function searchTerms(state = '', action) {
-    switch (action.type) {
-    case ActionTypes.UPDATE_RHS_SEARCH_TERMS:
-        return action.terms;
-    default:
-        return state;
-    }
-}
-
-function isSearching(state = false, action) {
-    switch (action.type) {
-    case SearchTypes.SEARCH_POSTS_REQUEST:
-        return true;
-    case SearchTypes.SEARCH_POSTS_FAILURE:
-    case SearchTypes.SEARCH_POSTS_SUCCESS:
+        if (action.from_pinned_posts) {
+            return action.from_pinned_posts;
+        }
         return false;
     default:
         return state;
@@ -83,9 +68,8 @@ function isSearching(state = false, action) {
 
 export default combineReducers({
     selectedPostId,
-    selectedChannelId,
-    previousRhsState,
-    rhsState,
-    searchTerms,
-    isSearching
+    selectedPostChannelId,
+    fromSearch,
+    fromFlaggedPosts,
+    fromPinnedPosts
 });

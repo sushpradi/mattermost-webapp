@@ -4,7 +4,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedDate, FormattedHTMLMessage, FormattedMessage, FormattedTime} from 'react-intl';
-import {browserHistory, Link} from 'react-router';
+import {browserHistory, Link} from 'react-router/es6';
 
 import * as UserUtils from 'mattermost-redux/utils/user_utils';
 
@@ -68,16 +68,6 @@ export default class SecurityTab extends React.Component {
             revokeUserAccessToken: PropTypes.func.isRequired,
 
             /*
-             * Function to activate a personal access token
-             */
-            enableUserAccessToken: PropTypes.func.isRequired,
-
-            /*
-             * Function to deactivate a personal access token
-             */
-            disableUserAccessToken: PropTypes.func.isRequired,
-
-            /*
              * Function to clear personal access tokens locally
              */
             clearUserAccessTokens: PropTypes.func.isRequired
@@ -136,7 +126,7 @@ export default class SecurityTab extends React.Component {
             return;
         }
 
-        const passwordErr = Utils.isValidPassword(newPassword, Utils.getPasswordConfig());
+        const passwordErr = Utils.isValidPassword(newPassword);
         if (passwordErr !== '') {
             this.setState({
                 passwordError: passwordErr,
@@ -1109,24 +1099,6 @@ export default class SecurityTab extends React.Component {
         this.handleCancelConfirm();
     }
 
-    activateToken = async (tokenId) => {
-        const {error} = await this.props.actions.enableUserAccessToken(tokenId);
-        if (error) {
-            this.setState({serverError: error.message});
-        } else {
-            trackEvent('settings', 'activate_user_access_token');
-        }
-    }
-
-    deactivateToken = async (tokenId) => {
-        const {error} = await this.props.actions.disableUserAccessToken(tokenId);
-        if (error) {
-            this.setState({serverError: error.message});
-        } else {
-            trackEvent('settings', 'deactivate_user_access_token');
-        }
-    }
-
     createTokensSection = () => {
         let updateSectionStatus;
         let tokenListClass = '';
@@ -1136,48 +1108,6 @@ export default class SecurityTab extends React.Component {
             Object.values(this.props.userAccessTokens).forEach((token) => {
                 if (this.state.newToken && this.state.newToken.id === token.id) {
                     return;
-                }
-
-                let activeLink;
-                let activeStatus;
-
-                if (token.is_active) {
-                    activeLink = (
-                        <a
-                            name={token.id + '_deactivate'}
-                            href='#'
-                            onClick={(e) => {
-                                e.preventDefault();
-                                this.deactivateToken(token.id);
-                            }}
-                        >
-                            <FormattedMessage
-                                id='user.settings.tokens.deactivate'
-                                defaultMessage='Deactivate'
-                            />
-                        </a>);
-                } else {
-                    activeStatus = (
-                        <span className='has-error setting-box__inline-error'>
-                            <FormattedMessage
-                                id='user.settings.tokens.deactivatedWarning'
-                                defaultMessage='(Inactive)'
-                            />
-                        </span>
-                    );
-                    activeLink = (<a
-                        name={token.id + '_activate'}
-                        href='#'
-                        onClick={(e) => {
-                            e.preventDefault();
-                            this.activateToken(token.id);
-                        }}
-                                  >
-                        <FormattedMessage
-                            id='user.settings.tokens.activate'
-                            defaultMessage='Activate'
-                        />
-                    </a>);
                 }
 
                 tokenList.push(
@@ -1191,7 +1121,6 @@ export default class SecurityTab extends React.Component {
                                 defaultMessage='Token Description: '
                             />
                             {token.description}
-                            {activeStatus}
                         </div>
                         <div className='setting-box__token-id whitespace--nowrap overflow--ellipsis'>
                             <FormattedMessage
@@ -1201,10 +1130,8 @@ export default class SecurityTab extends React.Component {
                             {token.id}
                         </div>
                         <div>
-                            {activeLink}
-                            {' - '}
                             <a
-                                name={token.id + '_delete'}
+                                name={token.id}
                                 href='#'
                                 onClick={(e) => {
                                     e.preventDefault();
@@ -1239,7 +1166,7 @@ export default class SecurityTab extends React.Component {
                     <span>
                         <FormattedHTMLMessage
                             id='user.settings.tokens.description_mobile'
-                            defaultMessage='<a href="https://about.mattermost.com/default-user-access-tokens" target="_blank">Personal access tokens</a> function similarly to session tokens and can be used by integrations to <a href="https://about.mattermost.com/default-api-authentication" target="_blank">authenticate against the REST API</a>. Create new tokens on your desktop.'
+                            defaultMessage='<a href="https://about.mattermost.com/default-user-access-tokens" target="_blank">Personal access tokens</a> function similar to session tokens and can be used by integrations to <a href="https://about.mattermost.com/default-api-authentication" target="_blank">authenticate against the REST API</a>. Create new tokens on your desktop.'
                         />
                     </span>
                 );
@@ -1248,7 +1175,7 @@ export default class SecurityTab extends React.Component {
                     <span>
                         <FormattedHTMLMessage
                             id='user.settings.tokens.description'
-                            defaultMessage='<a href="https://about.mattermost.com/default-user-access-tokens" target="_blank">Personal access tokens</a> function similarly to session tokens and can be used by integrations to <a href="https://about.mattermost.com/default-api-authentication" target="_blank">authenticate against the REST API</a>.'
+                            defaultMessage='<a href="https://about.mattermost.com/default-user-access-tokens" target="_blank">Personal access tokens</a> function similar to session tokens and can be used by integrations to <a href="https://about.mattermost.com/default-api-authentication" target="_blank">authenticate against the REST API</a>.'
                         />
                     </span>
                 );

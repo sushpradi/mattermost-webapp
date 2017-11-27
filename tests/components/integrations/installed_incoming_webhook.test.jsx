@@ -164,7 +164,7 @@ describe('components/integrations/InstalledIncomingWebhook', () => {
                 }}
             />
         );
-        expect(wrapper.getElement()).toBe(null);
+        expect(wrapper.getNode()).toBe(null);
     });
 
     test('Should render a webhook item as filtered result is true', () => {

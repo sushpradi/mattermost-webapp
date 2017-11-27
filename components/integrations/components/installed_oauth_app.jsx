@@ -158,43 +158,40 @@ export default class InstalledOAuthApp extends React.PureComponent {
         let showHide;
         if (this.state.clientSecret === FAKE_SECRET) {
             showHide = (
-                <button
-                    id='showSecretButton'
-                    className='style--none color--link'
+                <a
+                    href='#'
                     onClick={this.handleShowClientSecret}
                 >
                     <FormattedMessage
                         id='installed_integrations.showSecret'
                         defaultMessage='Show Secret'
                     />
-                </button>
+                </a>
             );
         } else {
             showHide = (
-                <button
-                    id='hideSecretButton'
-                    className='style--none color--link'
+                <a
+                    href='#'
                     onClick={this.handleHideClientSecret}
                 >
                     <FormattedMessage
                         id='installed_integrations.hideSecret'
                         defaultMessage='Hide Secret'
                     />
-                </button>
+                </a>
             );
         }
 
         const regen = (
-            <button
-                id='regenerateSecretButton'
-                className='style--none color--link'
+            <a
+                href='#'
                 onClick={this.handleRegenerate}
             >
                 <FormattedMessage
                     id='installed_integrations.regenSecret'
                     defaultMessage='Regenerate Secret'
                 />
-            </button>
+            </a>
         );
 
         let icon;

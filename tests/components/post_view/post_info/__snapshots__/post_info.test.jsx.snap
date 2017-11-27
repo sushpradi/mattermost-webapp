@@ -63,8 +63,9 @@ exports[`components/post_view/PostInfo hideEmojiPicker, should have called props
         spaceRequiredBelow={436}
         target={[Function]}
       />
-      <button
-        className="reacticon__container color--link style--none"
+      <a
+        className="reacticon__container"
+        href="#"
         onClick={[Function]}
       >
         <span
@@ -75,7 +76,7 @@ exports[`components/post_view/PostInfo hideEmojiPicker, should have called props
             }
           }
         />
-      </button>
+      </a>
     </span>
     <CommentIcon
       commentCount={0}
@@ -152,8 +153,9 @@ exports[`components/post_view/PostInfo reactEmojiClick, should have called props
         spaceRequiredBelow={436}
         target={[Function]}
       />
-      <button
-        className="reacticon__container color--link style--none"
+      <a
+        className="reacticon__container"
+        href="#"
         onClick={[Function]}
       >
         <span
@@ -164,7 +166,7 @@ exports[`components/post_view/PostInfo reactEmojiClick, should have called props
             }
           }
         />
-      </button>
+      </a>
     </span>
     <CommentIcon
       commentCount={0}
@@ -241,8 +243,9 @@ exports[`components/post_view/PostInfo removePost, should have called props.acti
         spaceRequiredBelow={436}
         target={[Function]}
       />
-      <button
-        className="reacticon__container color--link style--none"
+      <a
+        className="reacticon__container"
+        href="#"
         onClick={[Function]}
       >
         <span
@@ -253,7 +256,7 @@ exports[`components/post_view/PostInfo removePost, should have called props.acti
             }
           }
         />
-      </button>
+      </a>
     </span>
     <CommentIcon
       commentCount={0}
@@ -458,8 +461,9 @@ exports[`components/post_view/PostInfo should match snapshot, enable emoji picke
         spaceRequiredBelow={436}
         target={[Function]}
       />
-      <button
-        className="reacticon__container color--link style--none"
+      <a
+        className="reacticon__container"
+        href="#"
         onClick={[Function]}
       >
         <span
@@ -470,7 +474,7 @@ exports[`components/post_view/PostInfo should match snapshot, enable emoji picke
             }
           }
         />
-      </button>
+      </a>
     </span>
     <CommentIcon
       commentCount={0}
@@ -501,13 +505,14 @@ exports[`components/post_view/PostInfo should match snapshot, ephemeral deleted 
   <div
     className="col col__remove"
   >
-    <button
-      className="post__remove theme color--link style--none"
+    <a
+      className="post__remove theme"
+      href="#"
       onClick={[Function]}
       type="button"
     >
       ×
-    </button>
+    </a>
   </div>
 </div>
 `;
@@ -538,13 +543,14 @@ exports[`components/post_view/PostInfo should match snapshot, ephemeral post 1`]
   <div
     className="col col__remove"
   >
-    <button
-      className="post__remove theme color--link style--none"
+    <a
+      className="post__remove theme"
+      href="#"
       onClick={[Function]}
       type="button"
     >
       ×
-    </button>
+    </a>
   </div>
 </div>
 `;
@@ -813,8 +819,9 @@ exports[`components/post_view/PostInfo toggleEmojiPicker, should have called pro
         spaceRequiredBelow={436}
         target={[Function]}
       />
-      <button
-        className="reacticon__container color--link style--none"
+      <a
+        className="reacticon__container"
+        href="#"
         onClick={[Function]}
       >
         <span
@@ -825,7 +832,7 @@ exports[`components/post_view/PostInfo toggleEmojiPicker, should have called pro
             }
           }
         />
-      </button>
+      </a>
     </span>
     <CommentIcon
       commentCount={0}

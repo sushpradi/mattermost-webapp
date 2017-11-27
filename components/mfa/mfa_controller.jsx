@@ -4,7 +4,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
-import {browserHistory} from 'react-router';
+import {browserHistory} from 'react-router/es6';
 
 import {emitUserLoggedOutEvent} from 'actions/global_actions.jsx';
 
@@ -24,8 +24,8 @@ export default class MFAController extends React.Component {
         if (window.mm_config.EnforceMultifactorAuthentication === 'true') {
             backButton = (
                 <div className='signup-header'>
-                    <button
-                        className='style--none color--link'
+                    <a
+                        href='#'
                         onClick={(e) => {
                             e.preventDefault();
                             emitUserLoggedOutEvent('/login');
@@ -36,7 +36,7 @@ export default class MFAController extends React.Component {
                             id='web.header.logout'
                             defaultMessage='Logout'
                         />
-                    </button>
+                    </a>
                 </div>
             );
         } else {

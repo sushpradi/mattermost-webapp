@@ -283,10 +283,6 @@
             }
         }
 
-        .post-add-reaction {
-            display: none;
-        }
-
         .reacticon__container {
             display: none;
         }
@@ -355,6 +351,7 @@
 
         &.current--user {
             .post__header {
+                margin-bottom: 7px;
             }
 
             &.same--root {
@@ -659,18 +656,13 @@
             .nav-pills {
                 > li {
                     &.active {
-                        button {
+                        a {
                             background: transparent;
 
                             &:before {
                                 display: none;
                             }
                         }
-                    }
-
-                    button {
-                        border-bottom: 1px solid;
-                        padding: 15px;
                     }
                 }
             }
@@ -689,7 +681,6 @@
                 .modal-image__wrapper {
                     > div {
                         font-size: 12px;
-                        max-width: 70%;
                         min-width: 250px;
                     }
 
@@ -845,11 +836,6 @@
                         .section-edit {
                             text-align: left;
 
-                            button {
-                                text-align: left;
-                                width: 100%;
-                            }
-
                             .fa {
                                 display: inline-block;
                             }
@@ -976,8 +962,7 @@
                 }
 
                 > li {
-                    > a,
-                    > button {
+                    > a {
                         border-bottom: 1px solid alpha-color($white, .3);
                         color: $white;
                         font-weight: 600;

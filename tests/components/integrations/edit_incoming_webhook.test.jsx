@@ -3,7 +3,6 @@
 
 import React from 'react';
 import {shallow} from 'enzyme';
-import {browserHistory} from 'react-router';
 
 import EditIncomingWebhook from 'components/integrations/components/edit_incoming_webhook/edit_incoming_webhook.jsx';
 
@@ -77,27 +76,21 @@ describe('components/integrations/EditIncomingWebhook', () => {
         expect(getIncomingHook).toHaveBeenCalledTimes(0);
     });
 
-    test('should have called submitHook when editIncomingHook is initiated (no server error)', async () => {
-        const newUpdateIncomingHook = jest.fn().mockReturnValue({data: ''});
-        const newActions = {...actions, updateIncomingHook: newUpdateIncomingHook};
+    test('should have called submitHook when editIncomingHook is initiated (no server error)', () => {
         const asyncHook = {
             id: 'id',
             token: 'token'
         };
-        const props = {...requiredProps, actions: newActions, hook};
+        const props = {...requiredProps, actions, hook};
         const wrapper = shallow(<EditIncomingWebhook {...props}/>);
 
-        const instance = wrapper.instance();
-        await instance.editIncomingHook(asyncHook);
+        wrapper.instance().editIncomingHook(asyncHook);
         expect(wrapper).toMatchSnapshot();
-        expect(newActions.updateIncomingHook).toHaveBeenCalledTimes(1);
-        expect(newActions.updateIncomingHook).toBeCalledWith(asyncHook);
-        expect(wrapper.state('serverError')).toEqual('');
+        expect(updateIncomingHook).toHaveBeenCalledTimes(1);
+        expect(updateIncomingHook).toBeCalledWith(asyncHook);
     });
 
-    test('should have called submitHook when editIncomingHook is initiated (with server error)', async () => {
-        const newUpdateIncomingHook = jest.fn().mockReturnValue({data: ''});
-        const newActions = {...actions, updateIncomingHook: newUpdateIncomingHook};
+    test('should have called submitHook when editIncomingHook is initiated (with server error)', () => {
         const asyncHook = {
             id: 'id',
             token: 'token'
@@ -106,22 +99,18 @@ describe('components/integrations/EditIncomingWebhook', () => {
             status: 'error',
             error: {message: 'error message'}
         };
-        const props = {...requiredProps, actions: newActions, hook, updateIncomingHookRequest};
+        const props = {...requiredProps, actions, hook, updateIncomingHookRequest};
         const wrapper = shallow(<EditIncomingWebhook {...props}/>);
 
-        const instance = wrapper.instance();
-        await instance.editIncomingHook(asyncHook);
-
+        wrapper.instance().editIncomingHook(asyncHook);
         expect(wrapper).toMatchSnapshot();
-        expect(newActions.updateIncomingHook).toHaveBeenCalledTimes(1);
-        expect(newActions.updateIncomingHook).toBeCalledWith(asyncHook);
-        expect(wrapper.state('serverError')).toEqual(updateIncomingHookRequest.error.message);
+        expect(updateIncomingHook).toHaveBeenCalledTimes(1);
+        expect(updateIncomingHook).toBeCalledWith(asyncHook);
     });
 
-    test('should have called submitHook when editIncomingHook is initiated (with data)', async () => {
-        const newUpdateIncomingHook = jest.fn().mockReturnValue({data: 'data'});
+    test('should have called submitHook when editIncomingHook is initiated (with data)', () => {
+        const newUpdateIncomingHook = jest.fn(() => 'data');
         const newActions = {...actions, updateIncomingHook: newUpdateIncomingHook};
-        browserHistory.push = jest.fn();
         const asyncHook = {
             id: 'id',
             token: 'token'
@@ -129,13 +118,9 @@ describe('components/integrations/EditIncomingWebhook', () => {
         const props = {...requiredProps, actions: newActions, hook};
         const wrapper = shallow(<EditIncomingWebhook {...props}/>);
 
-        const instance = wrapper.instance();
-        await instance.editIncomingHook(asyncHook);
-
+        wrapper.instance().editIncomingHook(asyncHook);
         expect(wrapper).toMatchSnapshot();
         expect(newUpdateIncomingHook).toHaveBeenCalledTimes(1);
         expect(newUpdateIncomingHook).toBeCalledWith(asyncHook);
-        expect(wrapper.state('serverError')).toEqual('');
-        expect(browserHistory.push).toHaveBeenCalledWith(`/${requiredProps.team.name}/integrations/incoming_webhooks`);
     });
 });

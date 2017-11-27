@@ -30,11 +30,6 @@ export default class ConfirmModal extends React.Component {
         confirmButtonClass: PropTypes.string,
 
         /*
-         * The CSS class to apply to the modal
-         */
-        modalClass: PropTypes.string,
-
-        /*
          * Text/jsx element on the confirm button
          */
         confirmButtonText: PropTypes.node,
@@ -69,8 +64,7 @@ export default class ConfirmModal extends React.Component {
         title: '',
         message: '',
         confirmButtonClass: 'btn btn-primary',
-        confirmButtonText: '',
-        modalClass: ''
+        confirmButtonText: ''
     }
 
     componentDidMount() {
@@ -137,7 +131,7 @@ export default class ConfirmModal extends React.Component {
 
         return (
             <Modal
-                className={'modal-confirm ' + this.props.modalClass}
+                className='modal-confirm'
                 show={this.props.show}
                 onHide={this.props.onCancel}
             >

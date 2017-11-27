@@ -35,44 +35,36 @@ class UserStoreClass extends EventEmitter {
 
         store.subscribe(() => {
             const newEntities = store.getState().entities.users;
-            const entities = this.entities;
-            this.entities = newEntities;
 
-            if (newEntities.profiles !== entities.profiles) {
+            if (newEntities.profiles !== this.entities.profiles) {
                 this.emitChange();
             }
-
-            if (newEntities.profilesInChannel !== entities.profilesInChannel) {
+            if (newEntities.profilesInChannel !== this.entities.profilesInChannel) {
                 this.emitInChannelChange();
             }
-
-            if (newEntities.profilesNotInChannel !== entities.profilesNotInChannel) {
+            if (newEntities.profilesNotInChannel !== this.entities.profilesNotInChannel) {
                 this.emitNotInChannelChange();
             }
-
-            if (newEntities.profilesInTeam !== entities.profilesInTeam) {
+            if (newEntities.profilesInTeam !== this.entities.profilesInTeam) {
                 this.emitInTeamChange();
             }
-
-            if (newEntities.profilesNotInTeam !== entities.profilesNotInTeam) {
+            if (newEntities.profilesNotInTeam !== this.entities.profilesNotInTeam) {
                 this.emitNotInTeamChange();
             }
-
-            if (newEntities.profilesWithoutTeam !== entities.profilesWithoutTeam) {
+            if (newEntities.profilesWithoutTeam !== this.entities.profilesWithoutTeam) {
                 this.emitWithoutTeamChange();
             }
-
-            if (newEntities.statuses !== entities.statuses) {
+            if (newEntities.statuses !== this.entities.statuses) {
                 this.emitStatusesChange();
             }
-
-            if (newEntities.myAudits !== entities.myAudits) {
+            if (newEntities.myAudits !== this.entities.myAudits) {
                 this.emitAuditsChange();
             }
-
-            if (newEntities.mySessions !== entities.mySessions) {
+            if (newEntities.mySessions !== this.entities.mySessions) {
                 this.emitSessionsChange();
             }
+
+            this.entities = newEntities;
         });
     }
 
@@ -469,7 +461,6 @@ class UserStoreClass extends EventEmitter {
         if (user.notify_props.channel === 'true') {
             keys.push('@channel');
             keys.push('@all');
-            keys.push('@here');
         }
 
         const usernameKey = '@' + user.username;

@@ -205,11 +205,11 @@ exports[`components/user_settings/EmailNotificationSetting should match snapshot
           >
             <hr />
             <SaveButton
-              defaultMessage="Save"
+              defaultMessage="Saving"
               disabled={false}
               onClick={[Function]}
               saving={false}
-              savingMessage="Saving"
+              savingMessageId="setting_item_max.saving"
             >
               <button
                 className="save-button btn btn-primary"
@@ -218,7 +218,15 @@ exports[`components/user_settings/EmailNotificationSetting should match snapshot
                 onClick={[Function]}
                 type="submit"
               >
-                Save
+                <FormattedMessage
+                  defaultMessage="Save"
+                  id="admin.save"
+                  values={Object {}}
+                >
+                  <span>
+                    Save
+                  </span>
+                </FormattedMessage>
               </button>
             </SaveButton>
             <button
@@ -601,11 +609,11 @@ exports[`components/user_settings/EmailNotificationSetting should match snapshot
           >
             <hr />
             <SaveButton
-              defaultMessage="Save"
+              defaultMessage="Saving"
               disabled={false}
               onClick={[Function]}
               saving={false}
-              savingMessage="Saving"
+              savingMessageId="setting_item_max.saving"
             >
               <button
                 className="save-button btn btn-primary"
@@ -614,7 +622,15 @@ exports[`components/user_settings/EmailNotificationSetting should match snapshot
                 onClick={[Function]}
                 type="submit"
               >
-                Save
+                <FormattedMessage
+                  defaultMessage="Save"
+                  id="admin.save"
+                  values={Object {}}
+                >
+                  <span>
+                    Save
+                  </span>
+                </FormattedMessage>
               </button>
             </SaveButton>
             <button

@@ -6,12 +6,11 @@ import {FormattedMessage} from 'react-intl';
 
 import {elasticsearchPurgeIndexes, elasticsearchTest} from 'actions/admin_actions.jsx';
 
-import {JobStatuses, JobTypes} from 'utils/constants.jsx';
 import * as Utils from 'utils/utils.jsx';
 
 import AdminSettings from './admin_settings.jsx';
 import BooleanSetting from './boolean_setting.jsx';
-import JobsTable from './jobs';
+import ElasticsearchStatus from './elasticsearch_status';
 import RequestButton from './request_button/request_button.jsx';
 import SettingsGroup from './settings_group.jsx';
 import TextSetting from './text_setting.jsx';
@@ -116,20 +115,6 @@ export default class ElasticsearchSettings extends AdminSettings {
                 error(err);
             }
         );
-    }
-
-    getExtraInfo(job) {
-        if (job.status === JobStatuses.IN_PROGRESS) {
-            return (
-                <FormattedMessage
-                    id='admin.elasticsearch.percentComplete'
-                    defaultMessage='{percent}% Complete'
-                    values={{percent: Number(job.progress)}}
-                />
-            );
-        }
-
-        return null;
     }
 
     renderTitle() {
@@ -292,37 +277,9 @@ export default class ElasticsearchSettings extends AdminSettings {
                     }}
                     disabled={!this.state.enableIndexing}
                 />
-                <div className='form-group'>
-                    <label
-                        className='control-label col-sm-4'
-                    >
-                        <FormattedMessage
-                            id='admin.elasticsearch.bulkIndexingTitle'
-                            defaultMessage='Bulk Indexing:'
-                        />
-                    </label>
-                    <div className='col-sm-8'>
-                        <div className='job-table-setting'>
-                            <JobsTable
-                                jobType={JobTypes.ELASTICSEARCH_POST_INDEXING}
-                                disabled={!this.state.canPurgeAndIndex}
-                                createJobButtonText={
-                                    <FormattedMessage
-                                        id='admin.elasticsearch.createJob.title'
-                                        defaultMessage='Index Now'
-                                    />
-                                }
-                                createJobHelpText={
-                                    <FormattedMessage
-                                        id='admin.elasticsearch.createJob.help'
-                                        defaultMessage='All posts in the database will be indexed from oldest to newest. Elasticsearch is available during indexing but search results may be incomplete until the indexing job is complete.'
-                                    />
-                                }
-                                getExtraInfoText={this.getExtraInfo}
-                            />
-                        </div>
-                    </div>
-                </div>
+                <ElasticsearchStatus
+                    isConfigured={this.state.canPurgeAndIndex}
+                />
                 <RequestButton
                     requestAction={elasticsearchPurgeIndexes}
                     helpText={

@@ -6,7 +6,7 @@ import React from 'react';
 import {Modal} from 'react-bootstrap';
 import {FormattedMessage} from 'react-intl';
 
-export default class PostDeletedModal extends React.Component {
+export default class PostDeletedModal extends React.PureComponent {
     static propTypes = {
 
         /**

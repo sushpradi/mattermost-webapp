@@ -19,7 +19,7 @@ import CreateComment from 'components/create_comment';
 import DateSeparator from 'components/post_view/date_separator.jsx';
 import FloatingTimestamp from 'components/post_view/floating_timestamp.jsx';
 import Comment from 'components/rhs_comment.jsx';
-import RhsHeaderPost from 'components/rhs_header_post';
+import RhsHeaderPost from 'components/rhs_header_post.jsx';
 import RootPost from 'components/rhs_root_post.jsx';
 
 const Preferences = Constants.Preferences;
@@ -52,36 +52,55 @@ export default class RhsThread extends React.Component {
     static propTypes = {
         posts: PropTypes.arrayOf(PropTypes.object).isRequired,
         selected: PropTypes.object.isRequired,
-        previousRhsState: PropTypes.string,
+        fromSearch: PropTypes.string,
+        fromFlaggedPosts: PropTypes.bool,
+        fromPinnedPosts: PropTypes.bool,
         isWebrtc: PropTypes.bool,
+        isMentionSearch: PropTypes.bool,
         currentUser: PropTypes.object.isRequired,
         useMilitaryTime: PropTypes.bool.isRequired,
         toggleSize: PropTypes.func,
         shrink: PropTypes.func,
         previewCollapsed: PropTypes.string.isRequired,
         previewEnabled: PropTypes.bool.isRequired,
-        postsEmbedVisibleObj: PropTypes.object,
         actions: PropTypes.shape({
             removePost: PropTypes.func.isRequired
         }).isRequired
     }
 
+    static defaultProps = {
+        fromSearch: '',
+        isMentionSearch: false
+    }
+
     constructor(props) {
         super(props);
 
+        this.mounted = false;
+
+        this.onUserChange = this.onUserChange.bind(this);
+        this.forceUpdateInfo = this.forceUpdateInfo.bind(this);
+        this.onPreferenceChange = this.onPreferenceChange.bind(this);
+        this.onStatusChange = this.onStatusChange.bind(this);
+        this.onBusy = this.onBusy.bind(this);
+        this.handleResize = this.handleResize.bind(this);
+        this.handleScroll = this.handleScroll.bind(this);
+        this.handleScrollStop = this.handleScrollStop.bind(this);
         this.scrollStopAction = new DelayedAction(this.handleScrollStop);
 
         const openTime = (new Date()).getTime();
+        const state = {};
+        state.windowWidth = Utils.windowWidth();
+        state.windowHeight = Utils.windowHeight();
+        state.profiles = JSON.parse(JSON.stringify(UserStore.getProfiles()));
+        state.compactDisplay = PreferenceStore.get(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.MESSAGE_DISPLAY, Preferences.MESSAGE_DISPLAY_DEFAULT) === Preferences.MESSAGE_DISPLAY_COMPACT;
+        state.flaggedPosts = PreferenceStore.getCategory(Constants.Preferences.CATEGORY_FLAGGED_POST);
+        state.statuses = Object.assign({}, UserStore.getStatuses());
+        state.previewsCollapsed = PreferenceStore.get(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.COLLAPSE_DISPLAY, 'false');
+        state.isBusy = WebrtcStore.isBusy();
 
         this.state = {
-            windowWidth: Utils.windowWidth(),
-            windowHeight: Utils.windowHeight(),
-            profiles: JSON.parse(JSON.stringify(UserStore.getProfiles())),
-            compactDisplay: PreferenceStore.get(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.MESSAGE_DISPLAY, Preferences.MESSAGE_DISPLAY_DEFAULT) === Preferences.MESSAGE_DISPLAY_COMPACT,
-            flaggedPosts: PreferenceStore.getCategory(Constants.Preferences.CATEGORY_FLAGGED_POST),
-            statuses: Object.assign({}, UserStore.getStatuses()),
-            previewsCollapsed: PreferenceStore.get(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.COLLAPSE_DISPLAY, 'false'),
-            isBusy: WebrtcStore.isBusy(),
+            ...state,
             isScrolling: false,
             topRhsPostCreateAt: 0,
             openTime
@@ -96,6 +115,8 @@ export default class RhsThread extends React.Component {
 
         this.scrollToBottom();
         window.addEventListener('resize', this.handleResize);
+
+        this.mounted = true;
     }
 
     componentWillUnmount() {
@@ -105,18 +126,8 @@ export default class RhsThread extends React.Component {
         WebrtcStore.removeBusyListener(this.onBusy);
 
         window.removeEventListener('resize', this.handleResize);
-    }
 
-    componentWillReceiveProps(nextProps) {
-        if (!this.props.selected || !nextProps.selected) {
-            return;
-        }
-
-        if (this.props.selected.id !== nextProps.selected.id) {
-            this.setState({
-                openTime: (new Date()).getTime()
-            });
-        }
+        this.mounted = false;
     }
 
     componentDidUpdate(prevProps) {
@@ -155,6 +166,10 @@ export default class RhsThread extends React.Component {
             return true;
         }
 
+        if (nextState.previewsCollapsed !== this.state.previewsCollapsed) {
+            return true;
+        }
+
         if (nextProps.previewEnabled !== this.props.previewEnabled) {
             return true;
         }
@@ -182,14 +197,14 @@ export default class RhsThread extends React.Component {
         if (nextState.topRhsPostCreateAt !== this.state.topRhsPostCreateAt) {
             return true;
         }
-        if (nextProps.postsEmbedVisibleObj !== this.props.postsEmbedVisibleObj) {
+        if (nextProps.previewCollapsed !== this.props.previewCollapsed) {
             return true;
         }
 
         return false;
     }
 
-    forceUpdateInfo = () => {
+    forceUpdateInfo() {
         if (this.state.postList) {
             for (var postId in this.state.postList.posts) {
                 if (this.refs[postId]) {
@@ -199,30 +214,48 @@ export default class RhsThread extends React.Component {
         }
     }
 
-    handleResize = () => {
+    handleResize() {
         this.setState({
             windowWidth: Utils.windowWidth(),
             windowHeight: Utils.windowHeight()
         });
     }
 
-    onPreferenceChange = () => {
+    componentWillReceiveProps(nextProps) {
+        if (!this.props.selected || !nextProps.selected) {
+            return;
+        }
+
+        if (this.props.selected.id !== nextProps.selected.id) {
+            this.setState({
+                openTime: (new Date()).getTime()
+            });
+        }
+    }
+
+    onPreferenceChange(category) {
+        let previewSuffix = '';
+        if (category === Preferences.CATEGORY_DISPLAY_SETTINGS) {
+            previewSuffix = '_' + Utils.generateId();
+        }
+
         this.setState({
             compactDisplay: PreferenceStore.get(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.MESSAGE_DISPLAY, Preferences.MESSAGE_DISPLAY_DEFAULT) === Preferences.MESSAGE_DISPLAY_COMPACT,
-            flaggedPosts: PreferenceStore.getCategory(Constants.Preferences.CATEGORY_FLAGGED_POST)
+            flaggedPosts: PreferenceStore.getCategory(Constants.Preferences.CATEGORY_FLAGGED_POST),
+            previewsCollapsed: PreferenceStore.get(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.COLLAPSE_DISPLAY, 'false') + previewSuffix
         });
         this.forceUpdateInfo();
     }
 
-    onStatusChange = () => {
+    onStatusChange() {
         this.setState({statuses: Object.assign({}, UserStore.getStatuses())});
     }
 
-    onBusy = (isBusy) => {
+    onBusy(isBusy) {
         this.setState({isBusy});
     }
 
-    filterPosts = (posts, selected, openTime) => {
+    filterPosts(posts, selected, openTime) {
         const postsArray = [];
 
         posts.forEach((cpost) => {
@@ -239,18 +272,18 @@ export default class RhsThread extends React.Component {
         return postsArray;
     }
 
-    onUserChange = () => {
+    onUserChange() {
         const profiles = JSON.parse(JSON.stringify(UserStore.getProfiles()));
         this.setState({profiles});
     }
 
-    scrollToBottom = () => {
+    scrollToBottom() {
         if ($('.post-right__scroll')[0]) {
             $('.post-right__scroll').parent().scrollTop($('.post-right__scroll')[0].scrollHeight);
         }
     }
 
-    updateFloatingTimestamp = () => {
+    updateFloatingTimestamp() {
         // skip this in non-mobile view since that's when the timestamp is visible
         if (!Utils.isMobile()) {
             return;
@@ -278,7 +311,7 @@ export default class RhsThread extends React.Component {
         }
     }
 
-    handleScroll = () => {
+    handleScroll() {
         this.updateFloatingTimestamp();
 
         if (!this.state.isScrolling) {
@@ -290,7 +323,7 @@ export default class RhsThread extends React.Component {
         this.scrollStopAction.fireAfter(Constants.SCROLL_DELAY);
     }
 
-    handleScrollStop = () => {
+    handleScrollStop() {
         this.setState({
             isScrolling: false
         });
@@ -361,7 +394,6 @@ export default class RhsThread extends React.Component {
                 previousPostDay = currentPostDay;
                 commentsLists.push(
                     <DateSeparator
-                        key={currentPostDay}
                         date={currentPostDay}
                     />);
             }
@@ -383,8 +415,6 @@ export default class RhsThread extends React.Component {
                         isBusy={this.state.isBusy}
                         removePost={this.props.actions.removePost}
                         previewCollapsed={this.props.previewCollapsed}
-                        previewEnabled={this.props.previewEnabled}
-                        isEmbedVisible={this.props.postsEmbedVisibleObj[comPost.id]}
                     />
                 </div>
             );
@@ -416,8 +446,11 @@ export default class RhsThread extends React.Component {
                     isRhsPost={true}
                 />
                 <RhsHeaderPost
-                    previousRhsState={this.props.previousRhsState}
+                    fromFlaggedPosts={this.props.fromFlaggedPosts}
+                    fromSearch={this.props.fromSearch}
+                    fromPinnedPosts={this.props.fromPinnedPosts}
                     isWebrtc={this.props.isWebrtc}
+                    isMentionSearch={this.props.isMentionSearch}
                     toggleSize={this.props.toggleSize}
                     shrink={this.props.shrink}
                 />
@@ -444,10 +477,9 @@ export default class RhsThread extends React.Component {
                             useMilitaryTime={this.props.useMilitaryTime}
                             isFlagged={isRootFlagged}
                             status={rootStatus}
-                            previewCollapsed={this.props.previewCollapsed}
+                            previewCollapsed={this.state.previewsCollapsed}
                             previewEnabled={this.props.previewEnabled}
                             isBusy={this.state.isBusy}
-                            isEmbedVisible={this.props.postsEmbedVisibleObj[selected.id]}
                         />
                         <div
                             ref='rhspostlist'

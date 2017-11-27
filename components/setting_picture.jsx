@@ -197,7 +197,7 @@ export default class SettingPicture extends Component {
                                 errors={[this.props.clientError, this.props.serverError]}
                                 type={'modal'}
                             />
-                            <div
+                            <button
                                 className='btn btn-sm btn-primary btn-file sel-btn'
                                 disabled={fileInputDisabled}
                             >
@@ -213,7 +213,7 @@ export default class SettingPicture extends Component {
                                     onChange={this.props.onFileChange}
                                     disabled={fileInputDisabled}
                                 />
-                            </div>
+                            </button>
                             {confirmButton}
                             <a
                                 className='btn btn-sm theme'

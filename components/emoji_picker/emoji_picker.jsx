@@ -118,7 +118,7 @@ export default class EmojiPicker extends React.Component {
                 name: 'flags',
                 className: 'fa fa-flag-o',
                 id: 'emoji_picker.flags',
-                message: 'Flags',
+                message: 'Fags',
                 offset: 0,
                 enable: false
             },
@@ -429,14 +429,9 @@ export default class EmojiPicker extends React.Component {
             pickerStyle.top += this.props.topOffset;
         }
 
-        let pickerClass = 'emoji-picker';
-        if (this.props.placement === 'bottom') {
-            pickerClass += ' bottom';
-        }
-
         return (
             <div
-                className={pickerClass}
+                className='emoji-picker'
                 style={pickerStyle}
             >
                 {this.emojiCategories()}

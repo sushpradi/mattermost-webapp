@@ -5,7 +5,7 @@ import React from 'react';
 
 import {getCustomEmojisByName} from 'mattermost-redux/selectors/entities/emojis';
 
-import EmojiStore, {EmojiMap} from 'stores/emoji_store.jsx';
+import {default as EmojiStore, EmojiMap} from 'stores/emoji_store.jsx';
 import store from 'stores/redux_store.jsx';
 import SuggestionStore from 'stores/suggestion_store.jsx';
 
@@ -14,7 +14,6 @@ import * as Emoticons from 'utils/emoticons.jsx';
 import Suggestion from './suggestion.jsx';
 
 const MIN_EMOTICON_LENGTH = 2;
-const EMOJI_CATEGORY_SUGGESTION_BLACKLIST = ['skintone'];
 
 class EmoticonSuggestion extends Suggestion {
     render() {
@@ -51,7 +50,7 @@ export default class EmoticonProvider {
     handlePretextChanged(suggestionId, pretext) {
         let hasSuggestions = false;
 
-        // Look for the potential emoticons at the start of the text, after whitespace, and at the start of emoji reaction commands
+        // look for the potential emoticons at the start of the text, after whitespace, and at the start of emoji reaction commands
         const captured = (/(^|\s|^\+|^-)(:([^:\s]*))$/g).exec(pretext);
         if (captured) {
             const prefix = captured[1];
@@ -63,24 +62,27 @@ export default class EmoticonProvider {
                 return false;
             }
 
-            // Check for text emoticons if this isn't for an emoji reaction
+            const matched = [];
+
+            // check for text emoticons if this isn't for an emoji reaction
             if (prefix !== '-' && prefix !== '+') {
                 for (const emoticon of Object.keys(Emoticons.emoticonPatterns)) {
                     if (Emoticons.emoticonPatterns[emoticon].test(text)) {
-                        // Don't show the autocomplete for text emoticons
-                        return false;
+                        SuggestionStore.addSuggestion(suggestionId, text, EmojiStore.get(emoticon), EmoticonSuggestion, text);
+
+                        hasSuggestions = true;
                     }
                 }
             }
 
-            const matched = [];
+            const emojis = new EmojiMap(getCustomEmojisByName(store.getState()));
 
-            // Check for named emoji
-            for (const [name, emoji] of new EmojiMap(getCustomEmojisByName(store.getState()))) {
+            // check for named emoji
+            for (const [name, emoji] of emojis) {
                 if (emoji.aliases) {
                     // This is a system emoji so it may have multiple names
                     for (const alias of emoji.aliases) {
-                        if (!EMOJI_CATEGORY_SUGGESTION_BLACKLIST.includes(emoji.category) && alias.indexOf(partialName) !== -1) {
+                        if (alias.indexOf(partialName) !== -1) {
                             matched.push({name: alias, emoji});
                             break;
                         }
@@ -91,7 +93,7 @@ export default class EmoticonProvider {
                 }
             }
 
-            // Sort the emoticons so that emoticons starting with the entered text come first
+            // sort the emoticons so that emoticons starting with the entered text come first
             matched.sort((a, b) => {
                 const aName = a.name;
                 const bName = b.name;

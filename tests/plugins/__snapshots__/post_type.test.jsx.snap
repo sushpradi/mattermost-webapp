@@ -49,6 +49,7 @@ exports[`plugins/PostMessageView should match snapshot with extended post type 1
       }
     }
     enableFormatting={true}
+    hasMention={false}
     isRHS={false}
     mentionKeys={Array []}
     options={Object {}}
@@ -76,6 +77,7 @@ exports[`plugins/PostMessageView should match snapshot with extended post type 1
     }
   >
     <PostTypePlugin
+      compactDisplay={undefined}
       isRHS={false}
       mentionKeys={Array []}
       post={
@@ -148,6 +150,7 @@ exports[`plugins/PostMessageView should match snapshot with no extended post typ
       }
     }
     enableFormatting={true}
+    hasMention={false}
     isRHS={false}
     mentionKeys={Array []}
     options={Object {}}

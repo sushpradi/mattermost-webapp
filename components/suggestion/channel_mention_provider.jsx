@@ -53,7 +53,7 @@ export default class ChannelMentionProvider extends Provider {
     constructor() {
         super();
 
-        this.lastPrefixWithNoResults = '';
+        this.lastTermWithNoResults = '';
         this.lastCompletedWord = '';
     }
 
@@ -65,9 +65,7 @@ export default class ChannelMentionProvider extends Provider {
             return false;
         }
 
-        const prefix = captured[3];
-
-        if (this.lastPrefixWithNoResults && prefix.startsWith(this.lastPrefixWithNoResults)) {
+        if (this.lastTermWithNoResults && pretext.startsWith(this.lastTermWithNoResults)) {
             // Just give up since we know it won't return any results
             return false;
         }
@@ -80,6 +78,8 @@ export default class ChannelMentionProvider extends Provider {
         // Clear the last completed word since we've started to match new text
         this.lastCompletedWord = '';
 
+        const prefix = captured[3];
+
         this.startNewRequest(suggestionId, prefix);
 
         autocompleteChannels(
@@ -90,7 +90,7 @@ export default class ChannelMentionProvider extends Provider {
                 }
 
                 if (channels.length === 0) {
-                    this.lastPrefixWithNoResults = prefix;
+                    this.lastTermWithNoResults = pretext;
                 }
 
                 // Wrap channels in an outer object to avoid overwriting the 'type' property.
@@ -138,6 +138,5 @@ export default class ChannelMentionProvider extends Provider {
 
     handleCompleteWord(term) {
         this.lastCompletedWord = term;
-        this.lastPrefixWithNoResults = '';
     }
 }

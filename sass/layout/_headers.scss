@@ -181,17 +181,6 @@
     margin-top: 12px;
     white-space: nowrap;
 
-    .dropdown-toggle {
-        overflow: hidden;
-        text-align: left;
-        text-overflow: ellipsis;
-        width: 100%;
-
-        strong {
-            max-width: calc(100% - 65px);
-        }
-    }
-
     .header-dropdown__icon {
         color: $dark-gray;
     }
@@ -209,7 +198,6 @@
     }
 
     .channel-header__description {
-        cursor: pointer;
         height: 24px;
         margin-bottom: 3px;
         margin-top: 3px;
@@ -230,14 +218,12 @@
         &.light {
             @include opacity(.8);
             color: inherit;
+            cursor: pointer;
 
             &:hover,
             &:focus {
                 color: inherit;
-
-                span {
-                    text-decoration: underline;
-                }
+                text-decoration: underline;
             }
         }
 

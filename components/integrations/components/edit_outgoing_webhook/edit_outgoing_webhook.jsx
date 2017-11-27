@@ -4,7 +4,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
-import {browserHistory} from 'react-router';
+import {browserHistory} from 'react-router/es6';
 
 import ConfirmModal from 'components/confirm_modal.jsx';
 import AbstractOutgoingWebhook from 'components/integrations/components/abstract_outgoing_webhook.jsx';
@@ -101,7 +101,7 @@ export default class EditOutgoingWebhook extends React.PureComponent {
     submitHook = async () => {
         this.setState({serverError: ''});
 
-        const {data} = await this.props.actions.updateOutgoingHook(this.newHook);
+        const data = await this.props.actions.updateOutgoingHook(this.newHook);
 
         if (data) {
             browserHistory.push(`/${this.props.team.name}/integrations/outgoing_webhooks`);

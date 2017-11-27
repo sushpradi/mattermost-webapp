@@ -3,7 +3,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {browserHistory} from 'react-router';
+import {browserHistory} from 'react-router/es6';
 
 import AbstractIncomingWebhook from 'components/integrations/components/abstract_incoming_webhook.jsx';
 
@@ -43,7 +43,7 @@ export default class AddIncomingWebhook extends React.PureComponent {
     addIncomingHook = async (hook) => {
         this.setState({serverError: ''});
 
-        const {data} = await this.props.actions.createIncomingHook(hook);
+        const data = await this.props.actions.createIncomingHook(hook);
         if (data) {
             browserHistory.push(`/${this.props.team.name}/integrations/confirm?type=incoming_webhooks&id=${data.id}`);
             return;

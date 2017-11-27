@@ -1,17 +1,16 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import 'bootstrap';
-
 import PropTypes from 'prop-types';
 import React from 'react';
+
+import 'bootstrap';
 
 import {reloadIfServerVersionChanged} from 'actions/global_actions.jsx';
 
 import AnnouncementBar from 'components/announcement_bar';
-import DiscardChangesModal from 'components/discard_changes_modal.jsx';
 
-import AdminSidebar from './admin_sidebar';
+import AdminSidebar from './admin_sidebar.jsx';
 
 export default class AdminConsole extends React.Component {
     static propTypes = {
@@ -26,33 +25,12 @@ export default class AdminConsole extends React.Component {
          */
         config: PropTypes.object.isRequired,
 
-        /*
-         * String whether to show prompt to navigate away
-         * from unsaved changes
-         */
-        showNavigationPrompt: PropTypes.bool.isRequired,
-
         actions: PropTypes.shape({
 
             /*
              * Function to get the config file
              */
-            getConfig: PropTypes.func.isRequired,
-
-            /*
-             * Function to block navigation when there are unsaved changes
-             */
-            setNavigationBlocked: PropTypes.func.isRequired,
-
-            /*
-             * Function to confirm navigation
-             */
-            confirmNavigation: PropTypes.func.isRequired,
-
-            /*
-             * Function to cancel navigation away from unsaved changes
-             */
-            cancelNavigation: PropTypes.func.isRequired
+            getConfig: PropTypes.func.isRequired
         }).isRequired
     }
 
@@ -62,9 +40,7 @@ export default class AdminConsole extends React.Component {
     }
 
     render() {
-        const {config, showNavigationPrompt} = this.props;
-        const {setNavigationBlocked, cancelNavigation, confirmNavigation} = this.props.actions;
-
+        const config = this.props.config;
         if (Object.keys(config).length === 0) {
             return <div/>;
         }
@@ -77,18 +53,9 @@ export default class AdminConsole extends React.Component {
             );
         }
 
-        const discardChangesModal = (
-            <DiscardChangesModal
-                show={showNavigationPrompt}
-                onConfirm={confirmNavigation}
-                onCancel={cancelNavigation}
-            />
-        );
-
         // not every page in the system console will need the config, but the vast majority will
         const children = React.cloneElement(this.props.children, {
-            config,
-            setNavigationBlocked
+            config
         });
         return (
             <div className='admin-console__wrapper'>
@@ -97,7 +64,6 @@ export default class AdminConsole extends React.Component {
                     <AdminSidebar/>
                     {children}
                 </div>
-                {discardChangesModal}
             </div>
         );
     }

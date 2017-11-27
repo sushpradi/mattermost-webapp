@@ -25,12 +25,9 @@
                     display: block;
                     margin-left: 11px;
                     text-decoration: none;
-                }
-
-                button {
-                    text-decoration: none;
-                    padding: 0;
-                    border: none;
+                    &:hover .team-btn {
+                      border-color: white;
+                    }
                 }
 
                 .team-btn {
@@ -70,7 +67,6 @@
                     &.team-btn__add {
                         height: 39px;
                         vertical-align: middle;
-                        width: 43px;
                     }
                 }
 

@@ -206,14 +206,14 @@ class JobTable extends React.PureComponent {
 
         if (millis <= 0 || job.status === JobStatuses.CANCELED) {
             return (
-                <span className='whitespace--nowrap'>{'--'}</span>
+                <span style={{whiteSpace: 'nowrap'}}>{'--'}</span>
             );
         }
 
         if (seconds <= 120) {
             return (
                 <span
-                    className='whitespace--nowrap'
+                    style={{whiteSpace: 'nowrap'}}
                     title={lastActivity}
                 >
                     {seconds + Utils.localizeMessage('admin.jobTable.runLengthSeconds', ' seconds')}
@@ -223,7 +223,7 @@ class JobTable extends React.PureComponent {
 
         return (
             <span
-                className='whitespace--nowrap'
+                style={{whiteSpace: 'nowrap'}}
                 title={lastActivity}
             >
                 {minutes + Utils.localizeMessage('admin.jobTable.runLengthMinutes', ' minutes')}
@@ -234,13 +234,13 @@ class JobTable extends React.PureComponent {
     getFinishAt = (status, millis) => {
         if (millis === 0 || status === JobStatuses.PENDING || status === JobStatuses.IN_PROGRESS || status === JobStatuses.CANCEL_REQUESTED) {
             return (
-                <span className='whitespace--nowrap'>{'--'}</span>
+                <span style={{whiteSpace: 'nowrap'}}>{'--'}</span>
             );
         }
 
         const date = new Date(millis);
         return (
-            <span className='whitespace--nowrap'>
+            <span style={{whiteSpace: 'nowrap'}}>
                 <FormattedDate
                     value={date}
                     day='2-digit'
@@ -327,15 +327,10 @@ class JobTable extends React.PureComponent {
         var items = this.props.jobs.map((job) => {
             return (
                 <tr key={job.id}>
-                    <td
-                        width='30px'
-                        className='whitespace--nowrap text-center'
-                    >
-                        {this.getCancelButton(job)}
-                    </td>
-                    <td className='whitespace--nowrap'>{this.getStatus(job)}</td>
-                    <td className='whitespace--nowrap'>{this.getFinishAt(job.status, job.last_activity_at)}</td>
-                    <td className='whitespace--nowrap'>{this.getRunLength(job)}</td>
+                    <td style={{whiteSpace: 'nowrap'}}>{this.getCancelButton(job)}</td>
+                    <td style={{whiteSpace: 'nowrap'}}>{this.getStatus(job)}</td>
+                    <td style={{whiteSpace: 'nowrap'}}>{this.getFinishAt(job.status, job.last_activity_at)}</td>
+                    <td style={{whiteSpace: 'nowrap'}}>{this.getRunLength(job)}</td>
                     <td colSpan='3'>{this.getExtraInfoText(job)}</td>
                 </tr>
             );
@@ -344,24 +339,26 @@ class JobTable extends React.PureComponent {
         return (
             <div className='job-table__panel'>
                 <div className='job-table__create-button'>
-                    <div>
-                        <button
-                            className='btn btn-default'
-                            onClick={this.handleCreateJob}
-                            disabled={this.props.disabled}
-                        >
-                            {this.props.createJobButtonText}
-                        </button>
-                    </div>
-                    <div className='help-text'>
-                        {this.props.createJobHelpText}
+                    <div className='form-group'>
+                        <div>
+                            <button
+                                className='btn btn-default'
+                                onClick={this.handleCreateJob}
+                                disabled={this.props.disabled}
+                            >
+                                {this.props.createJobButtonText}
+                            </button>
+                        </div>
+                        <div className='help-text'>
+                            {this.props.createJobHelpText}
+                        </div>
                     </div>
                 </div>
                 <div className='job-table__table'>
                     <table className='table'>
                         <thead>
                             <tr>
-                                <th width='30px'/>
+                                <th/>
                                 <th>
                                     <FormattedMessage
                                         id='admin.jobTable.headerStatus'
@@ -383,7 +380,7 @@ class JobTable extends React.PureComponent {
                                 <th colSpan='3'>
                                     <FormattedMessage
                                         id='admin.jobTable.headerExtraInfo'
-                                        defaultMessage='Details'
+                                        defaultMessage='Extra Information'
                                     />
                                 </th>
                             </tr>

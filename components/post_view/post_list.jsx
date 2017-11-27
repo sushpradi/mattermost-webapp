@@ -306,15 +306,13 @@ export default class PostList extends React.PureComponent {
             const getPostsBeforeAsync = this.props.actions.getPostsBefore(channelId, focusedPostId, 0, POSTS_PER_PAGE);
             const getPostsAfterAsync = this.props.actions.getPostsAfter(channelId, focusedPostId, 0, POSTS_PER_PAGE);
 
-            const result = await getPostsBeforeAsync;
-            posts = result.data;
+            posts = await getPostsBeforeAsync;
             await getPostsAfterAsync;
             await getPostThreadAsync;
 
             this.hasScrolledToFocusedPost = true;
         } else {
-            const result = await this.props.actions.getPosts(channelId, 0, POSTS_PER_PAGE);
-            posts = result.data;
+            posts = await this.props.actions.getPosts(channelId, 0, POSTS_PER_PAGE);
             this.hasScrolledToNewMessageSeparator = true;
         }
 
@@ -525,16 +523,17 @@ export default class PostList extends React.PureComponent {
             );
         } else {
             topRow = (
-                <button
+                <a
                     ref='loadmoretop'
-                    className='more-messages-text theme style--none color--link'
+                    className='more-messages-text theme'
+                    href='#'
                     onClick={this.loadMorePosts}
                 >
                     <FormattedMessage
                         id='posts_view.loadMore'
                         defaultMessage='Load more messages'
                     />
-                </button>
+                </a>
             );
         }
 

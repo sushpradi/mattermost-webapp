@@ -19,7 +19,7 @@ export default class SidebarHeaderDropdownButton extends React.PureComponent {
             <Tooltip id='main-menu__tooltip'>
                 <FormattedMessage
                     id='sidebar.mainMenu'
-                    defaultMessage='Main menu'
+                    defaultMessage=''
                 />
             </Tooltip>
         );
@@ -34,12 +34,11 @@ export default class SidebarHeaderDropdownButton extends React.PureComponent {
                 <button
                     id='sidebarHeaderDropdownButton'
                     className='sidebar-header-dropdown__toggle cursor--pointer style--none'
-                    onClick={this.props.onClick}
                 >
-                    <span
+                    {/*<span
                         className='sidebar-header-dropdown__icon'
                         dangerouslySetInnerHTML={{__html: Constants.MENU_ICON}}
-                    />
+                    />*/}
                 </button>
             </OverlayTrigger>
         );

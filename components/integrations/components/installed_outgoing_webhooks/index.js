@@ -9,18 +9,12 @@ import {getUsers} from 'mattermost-redux/selectors/entities/users';
 import InstalledOutgoingWebhook from './installed_outgoing_webhooks.jsx';
 
 function mapStateToProps(state, ownProps) {
-    const teamId = getCurrentTeamId(state);
-    const outgoingHooks = getOutgoingHooks(state);
-    const outgoingWebhooks = Object.keys(outgoingHooks).
-        map((key) => outgoingHooks[key]).
-        filter((outgoingWebhook) => outgoingWebhook.team_id === teamId);
-
     return {
         ...ownProps,
-        outgoingWebhooks,
+        outgoingWebhooks: getOutgoingHooks(state),
         channels: getAllChannels(state),
         users: getUsers(state),
-        teamId
+        teamId: getCurrentTeamId(state)
     };
 }
 

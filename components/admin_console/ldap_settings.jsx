@@ -27,7 +27,6 @@ export default class LdapSettings extends AdminSettings {
 
     getConfigFromState(config) {
         config.LdapSettings.Enable = this.state.enable;
-        config.LdapSettings.EnableSync = this.state.enableSync;
         config.LdapSettings.LdapServer = this.state.ldapServer;
         config.LdapSettings.LdapPort = this.parseIntNonZero(this.state.ldapPort);
         config.LdapSettings.ConnectionSecurity = this.state.connectionSecurity;
@@ -54,7 +53,6 @@ export default class LdapSettings extends AdminSettings {
     getStateFromConfig(config) {
         return {
             enable: config.LdapSettings.Enable,
-            enableSync: config.LdapSettings.EnableSync,
             ldapServer: config.LdapSettings.LdapServer,
             ldapPort: config.LdapSettings.LdapPort,
             connectionSecurity: config.LdapSettings.ConnectionSecurity,
@@ -84,10 +82,6 @@ export default class LdapSettings extends AdminSettings {
                 defaultMessage='AD/LDAP'
             />
         );
-    }
-
-    shouldBeDisabled = () => {
-        return !(this.state.enable || this.state.enableSync);
     }
 
     renderJobData(job) {
@@ -153,23 +147,6 @@ export default class LdapSettings extends AdminSettings {
                     value={this.state.enable}
                     onChange={this.handleChange}
                 />
-                <BooleanSetting
-                    id='enableSync'
-                    label={
-                        <FormattedMessage
-                            id='admin.ldap.enableSyncTitle'
-                            defaultMessage='Enable Synchronization with AD/LDAP:'
-                        />
-                    }
-                    helpText={
-                        <FormattedMessage
-                            id='admin.ldap.enableSyncDesc'
-                            defaultMessage='When true, Mattermost periodically synchronizes users from AD/LDAP. When false, user attributes are updated in Mattermost during user login.'
-                        />
-                    }
-                    value={this.state.enableSync}
-                    onChange={this.handleChange}
-                />
                 <TextSetting
                     id='ldapServer'
                     label={
@@ -187,7 +164,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.ldapServer}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='ldapPort'
@@ -206,12 +183,12 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.ldapPort}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <ConnectionSecurityDropdownSettingLdap
                     value={this.state.connectionSecurity}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <BooleanSetting
                     id='skipCertificateVerification'
@@ -247,7 +224,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.baseDN}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='bindUsername'
@@ -265,7 +242,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.bindUsername}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='bindPassword'
@@ -283,7 +260,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.bindPassword}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='userFilter'
@@ -302,7 +279,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.userFilter}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='firstNameAttribute'
@@ -321,7 +298,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.firstNameAttribute}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='lastNameAttribute'
@@ -340,7 +317,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.lastNameAttribute}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='nicknameAttribute'
@@ -359,7 +336,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.nicknameAttribute}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='positionAttribute'
@@ -378,7 +355,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.positionAttribute}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='emailAttribute'
@@ -397,7 +374,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.emailAttribute}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='usernameAttribute'
@@ -416,7 +393,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.usernameAttribute}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='idAttribute'
@@ -435,7 +412,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.idAttribute}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='loginFieldName'
@@ -454,7 +431,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.loginFieldName}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='syncIntervalMinutes'
@@ -472,7 +449,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.syncIntervalMinutes}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='maxPageSize'
@@ -491,7 +468,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.maxPageSize}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <TextSetting
                     id='queryTimeout'
@@ -510,7 +487,7 @@ export default class LdapSettings extends AdminSettings {
                     }
                     value={this.state.queryTimeout}
                     onChange={this.handleChange}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                 />
                 <RequestButton
                     requestAction={ldapTest}
@@ -526,7 +503,7 @@ export default class LdapSettings extends AdminSettings {
                             defaultMessage='AD/LDAP Test'
                         />
                     }
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                     saveNeeded={this.state.saveNeeded}
                     saveConfigAction={this.doSubmit}
                     errorMessage={{
@@ -541,7 +518,7 @@ export default class LdapSettings extends AdminSettings {
                 <JobsTable
                     jobType={JobTypes.LDAP_SYNC}
                     getExtraInfoText={this.renderJobData}
-                    disabled={this.shouldBeDisabled()}
+                    disabled={!this.state.enable}
                     createJobButtonText={
                         <FormattedMessage
                             id='admin.ldap.sync_button'
